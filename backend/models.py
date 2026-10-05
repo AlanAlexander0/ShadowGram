@@ -1,0 +1,125 @@
+from typing import List, Optional, Any, Dict
+from pydantic import BaseModel, Field
+import time
+from sqlalchemy import Column, String, Float, Integer, Text, DateTime
+from sqlalchemy.orm import declarative_base
+from datetime import datetime, timezone
+
+Base = declarative_base()
+
+# ---------------------------------------------------------
+# SQLAlchemy Database Models (shadowgram.db)
+# ---------------------------------------------------------
+
+class SessionRecord(Base):
+    __tablename__ = "sessions"
+
+    id = Column(String(64), primary_key=True)
+    account_id = Column(String(64), index=True, nullable=False)
+    ip_hash = Column(String(64), nullable=True)
+    status = Column(String(32), default="active")  # active | quarantined
+    risk_label = Column(String(32), default="normal_organic")  # normal_organic | suspicious_syndicate | anomaly_outlier
+    kinetic_jerk_score = Column(Float, default=0.5)
+    cluster_id = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+class TelemetryRecord(Base):
+    __tablename__ = "telemetry_events"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    session_id = Column(String(64), index=True, nullable=False)
+    account_id = Column(String(64), index=True, nullable=False)
+    event_type = Column(String(32), nullable=False)
+    timestamp = Column(Float, nullable=False)
+    flight_time_ms = Column(Float, nullable=True)
+    dwell_time_ms = Column(Float, nullable=True)
+    pointer_jerk = Column(Float, nullable=True)
+    route_path = Column(String(128), nullable=True)
+    tripwire_id = Column(String(128), nullable=True)
+    raw_payload_json = Column(Text, nullable=True)
+
+
+class ClusterRecord(Base):
+    __tablename__ = "clusters"
+
+    cluster_id = Column(Integer, primary_key=True)
+    size = Column(Integer, default=0)
+    modularity_q = Column(Float, default=0.0)
+    status = Column(String(32), default="active")  # active | quarantined
+    quarantined_at = Column(DateTime, nullable=True)
+    reasons_json = Column(Text, nullable=True)
+
+
+# ---------------------------------------------------------
+# Pydantic Ingress & API Schemas (Frozen Contract SG-PROTO-00)
+# ---------------------------------------------------------
+
+class TelemetryPayload(BaseModel):
+    key_flight_time_ms: Optional[float] = None
+    key_dwell_time_ms: Optional[float] = None
+    pointer_curvature_jerk: Optional[float] = None
+    pointer_coordinates: Optional[List[List[float]]] = None  # [[x, y, t], ...]
+    route_path: Optional[str] = None
+    tripwire_id: Optional[str] = None
+    client_canvas_hash: Optional[str] = None
+    narrative_text: Optional[str] = None  # For semantic intent embedding
+    client_id_artifact_score: Optional[float] = None
+
+
+class TelemetryEvent(BaseModel):
+    session_id: str
+    account_id: str
+    timestamp: float = Field(default_factory=lambda: time.time())
+    event_type: str  # keydown | pointerdown | route_change | honey_dom_trip | loan_submit
+    telemetry_hmac: Optional[str] = None
+    payload: TelemetryPayload = Field(default_factory=TelemetryPayload)
+
+
+class GraphNode(BaseModel):
+    id: str  # account_id
+    session_id: str
+    cluster_id: Optional[int] = None
+    risk_label: str  # normal_organic | suspicious_syndicate | anomaly_outlier
+    kinetic_jerk_score: float
+    semantic_intent_vector: Optional[List[float]] = None
+    status: str = "active"  # active | quarantined
+
+
+class GraphLink(BaseModel):
+    source: str
+    target: str
+    weight: float
+    converged_layers: List[str]  # timing, navigation, semantic, kinetics, environment
+    delta_t_seconds: float
+
+
+class GraphCluster(BaseModel):
+    cluster_id: int
+    size: int
+    modularity_q: float
+    status: str  # active | quarantined
+    factual_reasons: List[str]
+    account_ids: List[str] = Field(default_factory=list)
+
+
+class GraphResponse(BaseModel):
+    nodes: List[GraphNode]
+    links: List[GraphLink]
+    clusters: List[GraphCluster]
+    global_modularity: float
+    total_active_sessions: int
+
+
+class QuarantineRequest(BaseModel):
+    cluster_id: int
+    action: str = "isolate"  # isolate | step_up_challenge | release
+    reason: str = "Coordinated multi-agent swarm detected via Louvain community clustering"
+    operator_id: str = "OFFICER-LEAD"
+
+
+class QuarantineResponse(BaseModel):
+    status: str
+    cluster_id: int
+    quarantined_accounts: int
+    timestamp: float
