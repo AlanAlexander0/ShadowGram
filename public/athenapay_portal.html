@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AthenaPay Instant Micro-Credit | Station 3</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background-color: #030712; color: #f9fafb; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+    .card { background: rgba(17, 24, 39, 0.95); border: 1px solid #1f2937; border-radius: 1rem; width: 100%; max-width: 440px; padding: 1.75rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); position: relative; }
+    .glow-bar { position: absolute; top: 0; left: 10%; width: 80%; height: 2px; background: linear-gradient(90deg, transparent, #06b6d4, transparent); }
+    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1f2937; padding-bottom: 1rem; margin-bottom: 1.25rem; }
+    .title { font-size: 1.2rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.5rem; }
+    .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981; }
+    .badge { font-size: 0.7rem; font-family: monospace; text-transform: uppercase; background: #083344; color: #38bdf8; border: 1px solid #0369a1; padding: 0.2rem 0.5rem; border-radius: 0.25rem; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem; }
+    .label { font-size: 0.75rem; color: #9ca3af; margin-bottom: 0.25rem; display: block; font-weight: 500; }
+    .input-readonly { width: 100%; background: #1f2937; border: 1px solid #374151; border-radius: 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.85rem; color: #d1d5db; cursor: not-allowed; }
+    .input-amount { color: #34d399; font-weight: 700; }
+    .judge-field { margin-top: 1rem; margin-bottom: 1rem; }
+    .judge-label { font-size: 0.8rem; font-weight: 600; color: #22d3ee; margin-bottom: 0.35rem; display: flex; justify-content: space-between; }
+    .judge-input { width: 100%; background: #111827; border: 2px solid #06b6d4; border-radius: 0.5rem; padding: 0.65rem 0.85rem; font-size: 0.95rem; color: #fff; outline: none; transition: 0.15s; }
+    .judge-input:focus { box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.25); border-color: #38bdf8; }
+    .btn-apply { width: 100%; padding: 0.85rem; background: linear-gradient(90deg, #06b6d4, #2563eb); border: none; border-radius: 0.75rem; color: #000; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; transition: 0.15s; box-shadow: 0 10px 20px -5px rgba(6, 182, 212, 0.4); }
+    .btn-apply:hover { background: linear-gradient(90deg, #22d3ee, #3b82f6); box-shadow: 0 12px 25px -5px rgba(6, 182, 212, 0.6); transform: translateY(-1px); }
+    .footer { margin-top: 1.25rem; padding-top: 0.75rem; border-top: 1px solid #1f2937; font-size: 0.7rem; color: #6b7280; display: flex; justify-content: space-between; }
+    .success-box { text-align: center; padding: 1.5rem 0; display: none; }
+    .checkmark { width: 48px; height: 48px; border-radius: 50%; background: rgba(16, 185, 129, 0.2); border: 2px solid #10b981; color: #10b981; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="glow-bar"></div>
+
+    <div class="header">
+      <div class="title">
+        <span class="pulse-dot"></span>
+        AthenaPay Credit
+      </div>
+      <span class="badge">Station 3 • 6s Test</span>
+    </div>
+
+    <!-- Live Form -->
+    <form id="loan-form">
+      <div class="grid">
+        <div>
+          <label class="label">Applicant</label>
+          <input id="input-name" type="text" class="input-readonly" value="Rohan Verma" readonly tabindex="-1">
+        </div>
+        <div>
+          <label class="label">PAN Number</label>
+          <input id="input-pan" type="text" class="input-readonly" value="ABCDE1234F" readonly tabindex="-1">
+        </div>
+      </div>
+
+      <div class="grid">
+        <div>
+          <label class="label">Monthly Income</label>
+          <input type="text" class="input-readonly" value="INR 45,000" readonly tabindex="-1">
+        </div>
+        <div>
+          <label class="label">Pre-Approved Limit</label>
+          <input id="input-amount" type="text" class="input-readonly input-amount" value="INR 10,000" readonly tabindex="-1">
+        </div>
+      </div>
+
+      <!-- Honey-DOM Tripwire (Hidden from humans, traps bots) -->
+      <div id="honey-dom-profile-sync" data-honey="tripwire" style="position:absolute;left:-9999px;opacity:0;">
+        <input type="text" name="honey_sync" tabindex="-1">
+      </div>
+
+      <!-- 6-Second Judge Testing Rule Field -->
+      <div class="judge-field">
+        <label class="judge-label">
+          <span>Loan Purpose (Type 3 words):</span>
+          <span style="font-weight:400;color:#9ca3af;font-size:0.7rem;">e.g. Laptop repair fee</span>
+        </label>
+        <input id="input-reason" type="text" class="judge-input" placeholder="Type 3 words here..." required autofocus>
+      </div>
+
+      <button id="btn-apply" type="submit" class="btn-apply">
+        &gt;&gt; APPLY NOW (INSTANT DISBURSAL) &lt;&lt;
+      </button>
+    </form>
+
+    <!-- Success Feedback -->
+    <div id="success-box" class="success-box">
+      <div class="checkmark">✓</div>
+      <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.35rem;">Loan Approved!</h3>
+      <p style="font-size: 0.85rem; color: #9ca3af; margin-bottom: 1rem;">Disbursing <strong style="color:#34d399;">INR 10,000</strong> to linked bank account.</p>
+      <div style="background:#1f2937; border-radius:0.5rem; padding:0.75rem; font-size:0.75rem; text-align:left; font-family:monospace; margin-bottom:1rem; color:#d1d5db;">
+        <div>Status: <span style="color:#10b981;font-weight:bold;">HUMAN_VERIFIED</span></div>
+        <div>Telemetry: <span style="color:#06b6d4;">Neuromotor tremor captured</span></div>
+      </div>
+      <button onclick="resetForm()" style="background:none; border:none; color:#9ca3af; text-decoration:underline; font-size:0.75rem; cursor:pointer;">Reset for next judge</button>
+    </div>
+
+    <div class="footer">
+      <span>Protected by ShadowGram Relational Forensics</span>
+      <span>v2.0-HackAthena</span>
+    </div>
+  </div>
+
+  <!-- Telemetry SDK -->
+  <script src="/telemetry.js"></script>
+  <script>
+    const form = document.getElementById('loan-form');
+    const successBox = document.getElementById('success-box');
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (window.ShadowGramTelemetry) {
+        window.ShadowGramTelemetry.pushEvent('pointerdown', {
+          route_path: '/loan -> /loan_approved',
+          reason_length: document.getElementById('input-reason').value.length
+        });
+        window.ShadowGramTelemetry.flush();
+      }
+      form.style.display = 'none';
+      successBox.style.display = 'block';
+    });
+
+    function resetForm() {
+      document.getElementById('input-reason').value = '';
+      successBox.style.display = 'none';
+      form.style.display = 'block';
+      document.getElementById('input-reason').focus();
+    }
+  </script>
+</body>
+</html>

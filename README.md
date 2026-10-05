@@ -1,32 +1,102 @@
-# ShadowGram: Autonomous AI Swarm Fraud Defense Cyber-Range
-**Event:** HackAthena 2026 | **Track:** Track 04 (Synthetic Identity & KYC) & Track 05 (Open Fraud)
+# 🛡️ ShadowGram: Autonomous AI Swarm Fraud Defense Cyber-Range
+**Event:** HackAthena 2026 | **Track:** Track 04 (Synthetic Identity & KYC) & Track 05 (Open Fraud)  
+**Architecture:** 4-Laptop Live Multi-Station Cyber-Range over Local Mobile Hotspot (`ShadowGram-AP`)  
+**Core Thesis:** Relational Graph Behavioral Forensics ($Q \ge 0.72$) — *Destroying the AI Syndicate Hive, Not Playing Whack-a-Mole*.
 
 ---
 
-## 🗂️ Project Directory & Navigation Index
+## 🗂️ 4-Station Live Cyber-Range Matrix
 
-### 1. Team Execution Pack (`ShadowGram_Team_Execution_Pack/`)
-The battle-tested operational guide, frozen schemas, and code implementations for each team member:
-* [`00_CHECKPOINT_AND_INTEGRATION_PROTOCOL.md`](file:///home/paradoxpete/Documents/ATHENA/ShadowGram_Team_Execution_Pack/00_CHECKPOINT_AND_INTEGRATION_PROTOCOL.md) - Master frozen API contracts, schemas, Windows firewall rules, and quality gates.
-* [`01_MASTER_UNFILTERED_BLUEPRINT.md`](file:///home/paradoxpete/Documents/ATHENA/ShadowGram_Team_Execution_Pack/01_MASTER_UNFILTERED_BLUEPRINT.md) - Unfiltered architectural dossier, Fortunato-Barthélemy resolution limit counter-proof, WebGL laser shaders, procedural audio, and judge battlecards.
-* [`02_MASTER_FILTERED_TEAM_GUIDE.md`](file:///home/paradoxpete/Documents/ATHENA/ShadowGram_Team_Execution_Pack/02_MASTER_FILTERED_TEAM_GUIDE.md) - Clean team mental model, 4-laptop desk geometry, 6-second judge testing rule, 3-minute pitch choreography, and team battlecards.
-* [`ROLE_1_PRINCIPAL_ARCHITECT_YOU.md`](file:///home/paradoxpete/Documents/ATHENA/ShadowGram_Team_Execution_Pack/ROLE_1_PRINCIPAL_ARCHITECT_YOU.md) - **Role 1 (ParadoxPete):** FastAPI backend, Louvain modularity graph engine, 10m sliding window filter, 2D-CNN ONNX classifier, and Sentence-Transformers.
-* [`ROLE_2_FRONTEND_3D_COMMAND_CENTER_AISWARYA.md`](file:///home/paradoxpete/Documents/ATHENA/ShadowGram_Team_Execution_Pack/ROLE_2_FRONTEND_3D_COMMAND_CENTER_AISWARYA.md) - **Role 2 (Aiswarya):** Next.js 14 cockpit, 3D WebGL Three.js force graph, single-pass emissive laser shader, 4-stage shockwave, Web Audio engine, and Google Pixel Hotspot AP.
-* [`ROLE_3_RED_TEAM_SWARM_AND_TELEMETRY.md`](file:///home/paradoxpete/Documents/ATHENA/ShadowGram_Team_Execution_Pack/ROLE_3_RED_TEAM_SWARM_AND_TELEMETRY.md) - **Role 3 (Alan):** Red-Team Playwright swarm script (<600MB RAM), standalone minimum-jerk trajectory generator with dynamic overshoot, and client telemetry hooks.
-* [`ROLE_4_DATA_NVIDIA_LLM_AND_LEGAL_SAR.md`](file:///home/paradoxpete/Documents/ATHENA/ShadowGram_Team_Execution_Pack/ROLE_4_DATA_NVIDIA_LLM_AND_LEGAL_SAR.md) - **Role 4 (Mohammed Nihad / Ashlin):** SQLite database models, NVIDIA NIM API legal narrative with 1500ms timeout circuit breaker, and 2-page ReportLab SAR PDF exporter.
+| Station | Lead | Hardware | Core Engine & Responsibility |
+| :--- | :--- | :--- | :--- |
+| **Station 1 (Red Team Swarm)** | **Alan Alexander** | Gaming Laptop #1 (Windows/NVIDIA) | 20-Context Playwright Bot Swarm, Flash & Hogan Neuromotor Trajectory Generator, NVIDIA NIM Identity Generator |
+| **Station 2 (Lead Hub & 3D Cockpit)** | **ParadoxPete & Aiswarya** | Gaming Laptop #2 (Linux / Dedicated GPU) | **Pete:** FastAPI Backend Gateway, Louvain Graph Modularity Engine, Kinetic Jerk Classifier<br>**Aiswarya:** Three.js 3D Force-Directed Graph Cockpit, Laser Emissive Shaders, Web Audio SFX |
+| **Station 3 (Target Portal)** | **Judge Interaction** | Laptop #3 (Windows/Mac) | AthenaPay Micro-Credit Portal, 6-Second Judge Testing Rule (95% pre-filled), Zero-PII Telemetry SDK |
+| **Station 4 (Legal & Compliance)** | **Ashlin & Mohammed Nihad** | Laptop #4 (Windows) | NVIDIA NIM Llama-3.3-70B Legal Engine (15s), 2-Page Courtroom SAR PDF Exporter, KYC ELA/Diffusion Scanner |
 
-### 2. Comprehensive Master Book (`ShadowGram_Master_Book/`)
-The complete, unabridged technical book written in ASD-STE100 specification with architecture diagrams and mathematical proofs:
-* [`ShadowGram_Master_Book_Complete.html`](file:///home/paradoxpete/Documents/ATHENA/ShadowGram_Master_Book/ShadowGram_Master_Book_Complete.html) - Complete consolidated single-file master book.
-* [`ShadowGram_Master_Plan_Book.pdf`](file:///home/paradoxpete/Documents/ATHENA/ShadowGram_Master_Book/ShadowGram_Master_Plan_Book.pdf) - Master compiled PDF version.
+---
 
-### 3. Presentation & Pitch Slide Decks (`NotebookLM_Slide_Packs/`)
-Designed for slide generation and teaching team members:
-* [`DECK_1_THE_PROBLEM_AND_THREAT_LANDSCAPE.md`](file:///home/paradoxpete/Documents/ATHENA/NotebookLM_Slide_Packs/DECK_1_THE_PROBLEM_AND_THREAT_LANDSCAPE.md) - Macro problem, empirical statistics, and competitor failure modes.
-* [`DECK_2_SHADOWGRAM_CORE_AND_MATH.md`](file:///home/paradoxpete/Documents/ATHENA/NotebookLM_Slide_Packs/DECK_2_SHADOWGRAM_CORE_AND_MATH.md) - 5-layer physics engine, minimum jerk, and Louvain modularity.
-* [`DECK_3_LIVE_CYBER_RANGE_AND_LEGAL_DEFENSE.md`](file:///home/paradoxpete/Documents/ATHENA/NotebookLM_Slide_Packs/DECK_3_LIVE_CYBER_RANGE_AND_LEGAL_DEFENSE.md) - 4-laptop range, CFPB adverse action compliance, and live demo choreography.
+## ⚡ Role 3: Red-Team Swarm Runner & Client Telemetry (Alan E Alexander)
 
-### 4. Deep Research & Empirical Evidence
-* [`SHADOWGRAM_EMPIRICAL_PROOFS_AND_AUDIT_DOSSIER.md`](file:///home/paradoxpete/Documents/ATHENA/SHADOWGRAM_EMPIRICAL_PROOFS_AND_AUDIT_DOSSIER.md) - Primary source fact-checked dossier (Krazybee PMLA case, Sift BNPL metrics, UIDAI fee regulation).
-* [`Lightweight Forensic Code Snippets.docx`](file:///home/paradoxpete/Documents/ATHENA/Lightweight%20Forensic%20Code%20Snippets.docx) - Research on minimum-jerk trajectory generation, emissive line shaders, and procedural Web Audio.
-* [`ShadowGram Hackathon Architectural Audit.docx`](file:///home/paradoxpete/Documents/ATHENA/ShadowGram%20Hackathon%20Architectural%20Audit.docx) - Full 50k-character architectural audit and stress test.
+### 1. Flash & Hogan Neuromotor Kinematics (`simulation/trajectory.py`)
+* Implements biological 5th-degree minimum-jerk polynomial curves:
+  $$s(\tau) = 10\tau^3 - 15\tau^4 + 6\tau^5$$
+* Features dynamic overshoot correction when target distance exceeds 220px.
+* Emulates realistic 8–12 Hz physiological micro-tremor with zero external dependencies.
+
+### 2. High-Performance Swarm Runner (`simulation/swarm_runner.py`)
+* **Strict Memory Limit:** Operates **1 single Chromium process** with 20 lightweight isolated `BrowserContext` instances.
+* **Media Route Abort:** Intercepts and blocks images, fonts, and styles, keeping total RAM consumption **strictly < 600MB**.
+* **Micro-Temporal Arrival Burst:** Synchronizes all 20 bot loan applications within a tight **1.4-second arrival window** ($Z > 4.5$).
+* **Dual Operation Modes:** Supports full Playwright browser automation or high-speed direct synthetic telemetry dispatch.
+
+### 3. Live NVIDIA NIM Persona Generator (`simulation/generate_personas.py`)
+* Connects live to NVIDIA NIM (`meta/llama-3.2-11b-vision-instruct` / `meta/llama-3.3-70b-instruct`) via OpenAI-compatible endpoints.
+* Generates 20 authentic Indian identities with varied occupations, cities, PANs, and convincing emergency loan reasons.
+* Includes a local deterministic generator so the system works 100% offline if venue Wi-Fi drops.
+
+### 4. Client Telemetry SDK (`public/telemetry.js`)
+* **Zero-PII Mandate:** Captures no key characters, names, or values. Only records millisecond time deltas ($\Delta t$): Key Flight Time and Key Dwell Time.
+* **50ms Cursor Throttle:** Samples cursor coordinates at most once per 50ms to guarantee zero UI lag when a visiting judge types.
+* **Cryptographic HMAC Signing:** Signs every telemetry batch using `HMAC_SHA256(session_id + timestamp, session_salt)` to reject forged cURL requests.
+* **Honey-DOM Tripwire:** Detects clicks on invisible DOM elements (`#honey-dom-profile-sync`) to flag crude automated scrapers instantly.
+
+### 5. AthenaPay Target Portal (<6-Second Judge Testing Rule)
+* Built in both React/Next.js ([`app/loan/page.tsx`](app/loan/page.tsx)) and standalone HTML ([`public/athenapay_portal.html`](public/athenapay_portal.html)).
+* 95% pre-filled by default (Name: Rohan Verma, PAN: ABCDE1234F, Income: ₹45,000, Amount: ₹10,000).
+* Exactly **1 editable field**: *"Loan Reason: [ Type 3 words ]"*.
+* Allows a visiting hackathon judge to walk up, type 3 words, click apply, and complete an authentic human test in under 6 seconds.
+
+---
+
+## 🧪 Verification & Testing
+
+### 1. Lead Architect Backend & Forensics (Role 1)
+```bash
+PYTHONPATH=. venv/bin/pytest -v
+# Output: 11 passed in 3.8s (100% pass rate)
+```
+
+### 2. Red-Team Swarm & Telemetry (Role 3 - Alan)
+```bash
+python tests/test_role3_pipeline.py
+# Output: 4 passed in 1.08s (100% pass rate)
+```
+
+---
+
+## 🚀 Live Demonstration Execution
+
+### Station 2: Launch Central Forensics Gateway (Laptop 2)
+```bash
+uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+### Station 3: Launch AthenaPay Portal (Laptop 3)
+```bash
+python -m http.server 3000 --directory public
+```
+Open `http://localhost:3000/athenapay_portal.html` in browser.
+
+### Station 1: Launch Swarm Attack (Laptop 1)
+```bash
+# Live Playwright browser attack:
+python simulation/swarm_runner.py --target-url http://192.168.43.3:3000 --bots 20
+
+# Direct high-speed synthetic mode (fallback):
+python simulation/swarm_runner.py --direct --telemetry-url http://192.168.43.2:8000/telemetry --bots 20
+```
+
+### Station 4: Launch Compliance & SAR Terminal (Laptop 4)
+```bash
+set SHADOWGRAM_SERVER=http://192.168.43.2:8000
+python compliance_terminal.py
+```
+
+---
+
+## 🗂️ Master Protocol & Audit Documentation
+* [`PROGRESS_CHECKPOINT_LEAD.md`](PROGRESS_CHECKPOINT_LEAD.md) - Lead Architect (Pete) M1 & M2 Milestone Certification.
+* [`PROGRESS_CHECKPOINT_MEMBER3.md`](PROGRESS_CHECKPOINT_MEMBER3.md) - Red Team Lead (Alan) M1 & M4 Protocol Audit.
+* [`00_CHECKPOINT_AND_INTEGRATION_PROTOCOL.md`](ShadowGram_Team_Execution_Pack/00_CHECKPOINT_AND_INTEGRATION_PROTOCOL.md) - Global Frozen Protocol and Cross-Platform Setup.
+* [`SHADOWGRAM_EMPIRICAL_PROOFS_AND_AUDIT_DOSSIER.md`](SHADOWGRAM_EMPIRICAL_PROOFS_AND_AUDIT_DOSSIER.md) - Fact-checked legal & empirical research dossier.
