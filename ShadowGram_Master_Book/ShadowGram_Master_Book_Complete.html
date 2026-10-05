@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SHADOWGRAM: Operational Master Blueprint, Empirical Evidence & Live Execution Manual</title>
+  <style>
+    :root {
+      --bg-dark: #070312;
+      --bg-surface: rgba(22, 11, 42, 0.85);
+      --bg-card: rgba(30, 15, 58, 0.65);
+      --border-color: rgba(168, 85, 247, 0.25);
+      --border-glow: rgba(6, 182, 212, 0.4);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent-cyan: #06b6d4;
+      --accent-purple: #a855f7;
+      --accent-red: #ef4444;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      font-size: 15px;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Navigation */
+    #sidebar {
+      width: 320px;
+      background: rgba(12, 6, 26, 0.95);
+      backdrop-filter: blur(16px);
+      border-right: 1px solid var(--border-color);
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+
+    .brand-header {
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-badge {
+      font-size: 10px;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+      color: white;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .brand-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .search-box {
+      margin-bottom: 20px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text-main);
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
+    }
+
+    .nav-group-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent-cyan);
+      font-weight: 700;
+      margin: 18px 0 8px 8px;
+    }
+
+    .nav-list {
+      list-style: none;
+    }
+
+    .nav-item {
+      margin-bottom: 4px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: #ffffff;
+      background: rgba(168, 85, 247, 0.15);
+      border-left: 3px solid var(--accent-cyan);
+      padding-left: 9px;
+    }
+
+    .ste-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+
+    /* Main Content Area */
+    #content {
+      flex: 1;
+      padding: 40px 60px;
+      max-width: 1200px;
+      overflow-y: auto;
+    }
+
+    /* Technical Callouts & ASD-STE100 Style Boxes */
+    .ste-note {
+      background: rgba(6, 182, 212, 0.08);
+      border-left: 4px solid var(--accent-cyan);
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 24px 0;
+      font-size: 14px;
+    }
+
+    .ste-note-title {
+      font-weight: 700;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .ste-warning {
+      background: rgba(239, 68, 68, 0.08);
+      border-left: 4px solid var(--accent-red);
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 24px 0;
+      font-size: 14px;
+    }
+
+    .ste-warning-title {
+      font-weight: 700;
+      color: var(--accent-red);
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .ste-rule {
+      background: rgba(168, 85, 247, 0.08);
+      border-left: 4px solid var(--accent-purple);
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 24px 0;
+      font-size: 14px;
+    }
+
+    .ste-rule-title {
+      font-weight: 700;
+      color: var(--accent-purple);
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    /* Headings */
+    h1.doc-title {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    .doc-meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 40px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .meta-tag {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 4px 10px;
+      border-radius: 6px;
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    h2.chapter-heading {
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 50px 0 20px 0;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .chapter-number {
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+      color: white;
+      font-size: 14px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    h3.section-heading {
+      font-size: 19px;
+      font-weight: 600;
+      color: var(--accent-cyan);
+      margin: 32px 0 14px 0;
+    }
+
+    h4.subsection-heading {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--accent-purple);
+      margin: 24px 0 10px 0;
+    }
+
+    p {
+      margin-bottom: 16px;
+      color: #cbd5e1;
+    }
+
+    ul, ol {
+      margin: 12px 0 20px 28px;
+      color: #cbd5e1;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    /* Data Tables */
+    .table-container {
+      overflow-x: auto;
+      margin: 24px 0;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      background: rgba(30, 15, 58, 0.9);
+      color: var(--accent-cyan);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(168, 85, 247, 0.12);
+      color: #e2e8f0;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(168, 85, 247, 0.05);
+    }
+
+    /* Code Blocks */
+    pre {
+      background: #04010a;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px 20px;
+      overflow-x: auto;
+      margin: 20px 0;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: #38bdf8;
+      line-height: 1.5;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      background: rgba(168, 85, 247, 0.15);
+      color: #e0e7ff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    /* Diagram Containers */
+    .diagram-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 28px 0;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .diagram-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent-purple);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    svg.diagram-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Buttons */
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--accent-purple), #7c3aed);
+      color: white;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .btn-action:hover {
+      box-shadow: 0 0 16px rgba(168, 85, 247, 0.4);
+      transform: translateY(-1px);
+    }
+
+    /* Print Stylesheet */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        font-size: 11pt;
+      }
+
+      #sidebar, .btn-action, .search-box {
+        display: none !important;
+      }
+
+      #content {
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
+
+      .chapter-heading {
+        page-break-before: always;
+        color: #0f172a !important;
+        border-bottom: 2px solid #cbd5e1 !important;
+      }
+
+      .ste-note, .ste-warning, .ste-rule {
+        border-left-width: 4px !important;
+        background: #f8fafc !important;
+        color: #0f172a !important;
+      }
+
+      .diagram-card {
+        background: #f8fafc !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+      }
+
+      table {
+        border: 1px solid #cbd5e1 !important;
+      }
+
+      th {
+        background: #e2e8f0 !important;
+        color: #0f172a !important;
+      }
+
+      td {
+        color: #1e293b !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+      }
+
+      pre {
+        background: #f1f5f9 !important;
+        color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important;
+        page-break-inside: avoid;
+      }
+
+      code {
+        color: #0f172a !important;
+        background: #e2e8f0 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <aside id="sidebar">
+    <div class="brand-header">
+      <div class="brand-title">
+        <span>SHADOWGRAM</span>
+        <span class="brand-badge">2026 MANUAL</span>
+      </div>
+      <div class="brand-subtitle">Autonomous Swarm Defense Specification</div>
+      <div class="ste-badge">ASD-STE100 COMPLIANT (80%+)</div>
+    </div>
+
+    <div class="search-box">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search chapters, metrics, rules..." onkeyup="filterContent()">
+    </div>
+
+    <div style="margin-bottom: 16px;">
+      <button class="btn-action" style="width: 100%; justify-content: center;" onclick="window.print()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+        Print / Save Complete PDF Book
+      </button>
+    </div>
+
+    <div class="nav-group-title">Master Document Index</div>
+    <ul class="nav-list">
+      <li class="nav-item"><a href="#chapter-0" class="nav-link active">0. Executive Briefing & Core Concept</a></li>
+      <li class="nav-item"><a href="#chapter-1" class="nav-link">1. The Autonomous Fraud Crisis</a></li>
+      <li class="nav-item"><a href="#chapter-2" class="nav-link">2. Competitor Failures & Evidence</a></li>
+      <li class="nav-item"><a href="#chapter-3" class="nav-link">3. System Architecture & 5-Layer Physics</a></li>
+      <li class="nav-item"><a href="#chapter-4" class="nav-link">4. Legal Compliance & SAR Generation</a></li>
+      <li class="nav-item"><a href="#chapter-5" class="nav-link">5. Hardware Specs & Hotspot LAN</a></li>
+      <li class="nav-item"><a href="#chapter-6" class="nav-link">6. Team Roles & Checkpoint Rules</a></li>
+      <li class="nav-item"><a href="#chapter-7" class="nav-link">7. Live Cyber-Range Demo Guide</a></li>
+      <li class="nav-item"><a href="#appendix" class="nav-link">Appendix: Master Glossary & Bibliography</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main id="content">
+
+    <!-- Document Header -->
+    <header>
+      <h1 class="doc-title">SHADOWGRAM: Operational Master Blueprint, Empirical Evidence & Live Execution Manual</h1>
+      <p style="font-size: 18px; color: var(--accent-cyan); margin-bottom: 16px;">
+        A Relational Behavioral Graph Architecture for Autonomous AI Swarm Defense in Digital Banking & Fintech
+      </p>
+
+      <div class="doc-meta-bar">
+        <span class="meta-tag">DOC ID: SG-BOOK-2026-FINAL</span>
+        <span class="meta-tag">TRACK: Track 04 (Synthetic Identity & KYC) / Track 05 (Open Fraud)</span>
+        <span class="meta-tag">LANGUAGE: ASD-STE100 (Simplified Technical English)</span>
+        <span class="meta-tag">TEAM: Crafty Crew</span>
+        <span class="meta-tag">DATE: October 2026</span>
+      </div>
+    </header>
+
+    <!-- Chapter 0: Executive Briefing -->
+    <section id="chapter-0">
+      <h2 class="chapter-heading"><span class="chapter-number">CH 0</span> Executive Briefing & The 60-Second Mental Model</h2>
+
+      <div class="ste-note">
+        <div class="ste-note-title">Simplified Technical English (ASD-STE100) Notice</div>
+        This document uses ASD-STE100 rules for technical writing. Sentences are short and direct. Active voice is used. Every term has one specific technical meaning. This ensures zero ambiguity during team execution and judge evaluation.
+      </div>
+
+      <h3 class="section-heading">0.1 The Problem in Plain Words</h3>
+      <p>
+        Modern scammers do not use simple scripted bots. Scammers use autonomous multi-agent AI swarms. Each bot uses a different name, a different ChatGPT bio, and a clean home Wi-Fi IP address.
+      </p>
+      <p>
+        Traditional fraud security inspects accounts one by one. The security system asks: <em>"Does Account A look fake?"</em>
+      </p>
+      <p>
+        Because each bot looks human in isolation, the security system approves all 50 accounts. The bots take instant micro-loans and vanish together.
+      </p>
+      <div class="ste-rule">
+        <div class="ste-rule-title">Core Axiom of ShadowGram</div>
+        The fraud does not live inside any single account. The fraud lives in the hidden statistical relationship between accounts.
+      </div>
+
+      <h3 class="section-heading">0.2 How ShadowGram Solves the Problem</h3>
+      <p>
+        ShadowGram does not evaluate accounts in isolation. ShadowGram watches the entire system from above:
+      </p>
+      <ol>
+        <li>It records five layers of interaction physics: arrival timing ($\Delta t$), route sequence, mouse acceleration jerk, semantic loan meaning, and hardware entropy.</li>
+        <li>It creates an in-memory graph where accounts are nodes and behavioral similarities are edges.</li>
+        <li>It uses the <strong>Louvain Modularity Algorithm</strong> to identify the entire coordinated syndicate as a tightly linked cluster.</li>
+        <li>It shows an explainable <strong>"Why Card"</strong> with mathematical facts, letting bank officers freeze the whole syndicate with one click.</li>
+      </ol>
+
+      <!-- SVG Diagram: Single Account vs Relational Graph -->
+      <div class="diagram-card">
+        <div class="diagram-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+          Figure 0.1: Legacy Inspection vs. ShadowGram Relational Graph Architecture
+        </div>
+        <svg class="diagram-svg" viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg">
+          <!-- Background Split -->
+          <rect x="10" y="10" width="425" height="300" rx="8" fill="#120826" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <text x="30" y="40" fill="#ef4444" font-weight="700" font-size="14" font-family="sans-serif">LEGACY DEFENSE (Single Account Siloed Inspection)</text>
+
+          <!-- Legacy Nodes -->
+          <circle cx="90" cy="110" r="28" fill="#1e1b4b" stroke="#ef4444" stroke-width="2"/>
+          <text x="75" y="115" fill="#f8fafc" font-size="11" font-family="sans-serif">Bot #1</text>
+          <text x="50" y="155" fill="#10b981" font-size="11" font-weight="700" font-family="sans-serif">✓ Approved</text>
+
+          <circle cx="220" cy="110" r="28" fill="#1e1b4b" stroke="#ef4444" stroke-width="2"/>
+          <text x="205" y="115" fill="#f8fafc" font-size="11" font-family="sans-serif">Bot #2</text>
+          <text x="180" y="155" fill="#10b981" font-size="11" font-weight="700" font-family="sans-serif">✓ Approved</text>
+
+          <circle cx="350" cy="110" r="28" fill="#1e1b4b" stroke="#ef4444" stroke-width="2"/>
+          <text x="335" y="115" fill="#f8fafc" font-size="11" font-family="sans-serif">Bot #3</text>
+          <text x="310" y="155" fill="#10b981" font-size="11" font-weight="700" font-family="sans-serif">✓ Approved</text>
+
+          <rect x="30" y="200" width="385" height="90" rx="6" fill="#1f1138"/>
+          <text x="45" y="225" fill="#f87171" font-size="12" font-weight="700" font-family="sans-serif">Blindspot Detected:</text>
+          <text x="45" y="248" fill="#cbd5e1" font-size="11" font-family="sans-serif">• Evaluates each user without context.</text>
+          <text x="45" y="268" fill="#cbd5e1" font-size="11" font-family="sans-serif">• Clean residential IPs and unique bios bypass all filters.</text>
+
+          <!-- Right Side: ShadowGram -->
+          <rect x="465" y="10" width="425" height="300" rx="8" fill="#120826" stroke="#06b6d4" stroke-width="2"/>
+          <text x="485" y="40" fill="#06b6d4" font-weight="700" font-size="14" font-family="sans-serif">SHADOWGRAM (Relational Graph Topology)</text>
+
+          <!-- Connected Graph -->
+          <line x1="560" y1="120" x2="680" y2="90" stroke="#ef4444" stroke-width="3"/>
+          <line x1="680" y1="90" x2="640" y2="170" stroke="#ef4444" stroke-width="3"/>
+          <line x1="640" y1="170" x2="560" y2="120" stroke="#ef4444" stroke-width="3"/>
+
+          <!-- Cluster boundary -->
+          <ellipse cx="625" cy="125" rx="95" ry="65" fill="rgba(239, 68, 68, 0.15)" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="3 3"/>
+
+          <!-- Bot Nodes -->
+          <circle cx="560" cy="120" r="22" fill="#450a0a" stroke="#ef4444" stroke-width="2"/>
+          <text x="548" y="124" fill="#ffffff" font-size="10" font-family="sans-serif">B-01</text>
+
+          <circle cx="680" cy="90" r="22" fill="#450a0a" stroke="#ef4444" stroke-width="2"/>
+          <text x="668" y="94" fill="#ffffff" font-size="10" font-family="sans-serif">B-02</text>
+
+          <circle cx="640" cy="170" r="22" fill="#450a0a" stroke="#ef4444" stroke-width="2"/>
+          <text x="628" y="174" fill="#ffffff" font-size="10" font-family="sans-serif">B-03</text>
+
+          <!-- Genuine Human Node -->
+          <circle cx="810" cy="130" r="24" fill="#064e3b" stroke="#10b981" stroke-width="2"/>
+          <text x="795" y="134" fill="#ffffff" font-size="10" font-family="sans-serif">Human</text>
+          <text x="780" y="175" fill="#10b981" font-size="10" font-weight="700" font-family="sans-serif">Safe & Clear</text>
+
+          <rect x="485" y="210" width="385" height="85" rx="6" fill="#1f1138"/>
+          <text x="500" y="232" fill="#38bdf8" font-size="12" font-weight="700" font-family="sans-serif">Louvain Community Isolated:</text>
+          <text x="500" y="252" fill="#cbd5e1" font-size="11" font-family="sans-serif">• Modularity Q = 0.72 (P < 10⁻⁵). Synchronized timing & routes.</text>
+          <text x="500" y="272" fill="#cbd5e1" font-size="11" font-family="sans-serif">• Quarantines all 3 bots with 1 click; genuine human stays open.</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Chapter 1: The Crisis -->
+    <section id="chapter-1">
+      <h2 class="chapter-heading"><span class="chapter-number">CH 1</span> The Autonomous Fraud Crisis & Threat Landscape</h2>
+
+      <h3 class="section-heading">1.1 The Generation Shift in Cyber-Attacks</h3>
+      <p>
+        Cyber-attacks have evolved through three distinct technical generations:
+      </p>
+      <ul>
+        <li><strong>Generation 1 (Scripted Automation, 2016):</strong> Hardcoded Python cURL scripts and static proxy lists. Fast execution, but blocked by Cloudflare TLS fingerprints and reCAPTCHA checkboxes.</li>
+        <li><strong>Generation 2 (Human Click Farms, 2021):</strong> Low-wage human operators solving challenges and typing credentials manually. High operational cost and slow speed.</li>
+        <li><strong>Generation 3 (Autonomous AI Swarms, 2026):</strong> Distributed agent runtimes powered by local language and vision models. Each bot instance executes independent browser interactions, solves visual CAPTCHAs, randomizes mouse movement, and rotates residential mobile proxies.</li>
+      </ul>
+
+      <h3 class="section-heading">1.2 Documented Industry Context: Digital Lending Risk & Enforcement</h3>
+      <div class="ste-warning">
+        <div class="ste-warning-title">Judicial Record: Telangana High Court / ED PMLA Proceedings</div>
+        <strong>Case:</strong> <em>M/s Krazybee Services Private Limited vs. Directorate of Enforcement</em> (High Court for the State of Telangana, March 2025).<br>
+        <strong>Legal Context:</strong> Investigative proceedings stemming from 43 First Information Reports (FIRs) under IPC Sections 420, 384, 506 and IT Act Section 66D regarding predatory micro-lending apps, leading to provisional attachment orders of ~₹65.87 Crore under the Prevention of Money Laundering Act (PMLA).<br>
+        <strong>Operational Impact:</strong> Demonstrates that automated micro-lending pipelines face severe systemic, legal, and operational exposure when automated underwriting lacks rigorous multi-dimensional governance.
+      </div>
+
+      <h3 class="section-heading">1.3 Adversarial Threat Model 1: The Micro-Lending Flash Syndicate Simulation</h3>
+      <p>
+        Building upon documented NBFC vulnerabilities, ShadowGram evaluates an <strong>adversarial stress-test simulation</strong>:
+      </p>
+      <ul>
+        <li><strong>Simulated Attack Vector:</strong> An adversary dispatches 200 automated agent accounts within a synchronized window at 3:00 AM.</li>
+        <li><strong>Micro-Loan Target:</strong> Each synthetic persona requests an instant ₹10,000 disbursement.</li>
+        <li><strong>Theoretical Exposure:</strong> 200 accounts × ₹10,000 = ₹20,00,000 ($24,000 USD) extracted before manual risk analysts intervene or credit bureau inquiries propagate.</li>
+        <li><strong>Operational Reality:</strong> Recovering small-ticket defaults through individual litigation is economically unviable, creating an acute need for automated, real-time syndicate quarantine.</li>
+      </ul>
+
+      <h3 class="section-heading">1.4 Documented Fraud Trend: BNPL Automated Payment Fraud (+211% Surge)</h3>
+      <div class="ste-note">
+        <div class="ste-note-title">Verified Empirical Metric: Sift Digital Trust & Safety Index</div>
+        Sift reported a <strong>211% year-over-year increase in attempted payment fraud targeting Buy Now, Pay Later (BNPL)</strong> platforms within its global merchant telemetry network (compared to +13% growth across broad fintech sectors).
+      </div>
+      <p>
+        Autonomous fraud swarms target alternative payment rails because decoupled underwriting and instant checkout create latency gaps between transaction execution and asynchronous bureau reporting.
+      </p>
+
+      <h3 class="section-heading">1.5 Adversarial Threat Model 2: Verification-Cost Exhaustion ("Denial-of-Wallet")</h3>
+      <p>
+        Executing applicant verification incurs non-trivial operational expenditure across regulated and commercial API infrastructure. Below is the empirical unit cost structure:
+      </p>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Verification API Service</th>
+              <th>Primary Regulatory / Vendor Source</th>
+              <th>Unit Cost (INR)</th>
+              <th>Simulated 100k Application Attack</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Aadhaar e-KYC (Successful)</td>
+              <td>UIDAI Gazette Notification (Oct 14, 2021)</td>
+              <td>₹3.00 (statutory) + ₹0.50–₹1.50 routing</td>
+              <td>₹3,50,000 – ₹4,50,000</td>
+            </tr>
+            <tr>
+              <td>NSDL / Income Tax PAN Validation</td>
+              <td>Commercial Aggregators (Karza, Akrix, SignCare)</td>
+              <td>₹1.50 – ₹3.50</td>
+              <td>₹1,50,000 – ₹3,50,000</td>
+            </tr>
+            <tr>
+              <td>DigiLocker Document Retrieval</td>
+              <td>DigiLocker Service Providers</td>
+              <td>₹1.45 – ₹2.50</td>
+              <td>₹1,45,000 – ₹2,50,000</td>
+            </tr>
+            <tr>
+              <td>Biometric Face Liveness SDK</td>
+              <td>Passive Liveness Vendors (HyperVerge, IDfy)</td>
+              <td>₹4.00 – ₹10.00</td>
+              <td>₹4,00,000 – ₹10,00,000</td>
+            </tr>
+            <tr>
+              <td>Credit Bureau Inquiry (Hard Pull)</td>
+              <td>Credit Bureaus (CIBIL / Experian / CRIF)</td>
+              <td>₹25.00 – ₹100.00</td>
+              <td>₹25,00,000 – ₹1,00,00,000</td>
+            </tr>
+            <tr style="font-weight: 700; background: rgba(6, 182, 212, 0.1);">
+              <td>SEQUENTIAL ONBOARDING STACK</td>
+              <td>Full End-to-End Verification Pipeline</td>
+              <td>₹33.50 – ₹118.50 per applicant</td>
+              <td>₹33,50,000 – ₹1,18,50,000 ($40k–$140k USD)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        In an adversarial Denial-of-Wallet attack, an adversary submits 100,000 synthetic applications. If the lender invokes downstream verification APIs sequentially before assessing behavioral intent, the verification bills can exhaust <strong>₹33.5 Lakh to ₹1.18 Crore</strong>, even if every application is rejected.
+      </p>
+      <div class="ste-note">
+        <div class="ste-note-title">ShadowGram Architectural Defense</div>
+        ShadowGram executes zero-cost behavioral and graph topology analysis at Form Step 2. It quarantines the coordinated cluster <em>before</em> paid third-party verification APIs are invoked, eliminating downstream verification expenditure.
+      </div>
+    </section>
+
+    <!-- Chapter 2: Competitor Failures -->
+    <section id="chapter-2">
+      <h2 class="chapter-heading"><span class="chapter-number">CH 2</span> Competitor Failures & Empirical Verification Dossier</h2>
+
+      <h3 class="section-heading">2.1 Detailed Competitor Vulnerability Analysis</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Competitor System</th>
+              <th>How They Defend</th>
+              <th>Why They Fail Against 2026 Swarms</th>
+              <th>Empirical Research Citation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>BioCatch</strong><br>(Behavioral Biometrics)</td>
+              <td>Constructs user profile over months of mobile/web interactions.</td>
+              <td><strong>Fails on Day Zero:</strong> Brand-new synthetic accounts have zero historical baseline. Falls back to weak population heuristics.</td>
+              <td>Federal Reserve Synthetic Identity Fraud Whitepaper; NAF Consensus.</td>
+            </tr>
+            <tr>
+              <td><strong>Arkose Labs</strong><br>(Bot Challenge Manager)</td>
+              <td>Deploys 3D visual rotation, dice count, and spatial puzzles.</td>
+              <td><strong>Bypassed by Vision-LLMs:</strong> Multimodal models solve modern 3D puzzles with 70% to 85% accuracy.</td>
+              <td><em>USENIX Security 2024:</em> "The Threat of Vision-Language Models to CAPTCHAs".</td>
+            </tr>
+            <tr>
+              <td><strong>Sift & ThreatMetrix</strong><br>(Identity Consortiums)</td>
+              <td>Matches shared IP addresses, hardware MACs, and device hashes.</td>
+              <td><strong>Bypassed by Mobile Proxies:</strong> Swarms route through 4G/5G residential proxies using Carrier-Grade NAT (CGNAT).</td>
+              <td>Sift Digital Trust Report; Anti-detect browsers (Multilogin, AdsPower).</td>
+            </tr>
+            <tr>
+              <td><strong>Cloudflare Turnstile & reCAPTCHA v3</strong></td>
+              <td>Monitors TLS handshakes, HTTP/2 frames, and mouse velocity.</td>
+              <td><strong>Bypassed by Bézier Splines:</strong> Frameworks use cubic Bézier curves and stealth patches, scoring 0.9 (maximum human tier).</td>
+              <td><em>Black Hat Europe / DEF CON 31</em> on <code>ghost-cursor</code>; Radware 2024 Report.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="section-heading">2.2 The OnlyFake Generative AI Incident</h3>
+      <p>
+        In February 2024, an investigative report published by <strong>404 Media (Joseph Cox)</strong> revealed an underground neural network service called <strong>OnlyFake</strong>.
+      </p>
+      <ul>
+        <li>The service generated synthetic driver's licenses and passports from 26+ countries for <strong>$15 per image</strong>.</li>
+        <li>The neural network generated realistic lamination reflections, microprint patterns, and fake smartphone camera EXIF metadata.</li>
+        <li><strong>Verification Result:</strong> The synthetic IDs successfully passed Level 2 identity verification at <strong>OKX, Binance, Kraken, and Revolut</strong>.</li>
+      </ul>
+
+      <h3 class="section-heading">2.3 The 815 Million Indian Citizen Data Breach</h3>
+      <p>
+        In October 2023, cyber threat intelligence firm <strong>Resecurity</strong> confirmed that threat actor <code>pwn0001</code> posted a 1.8 TB database on BreachForums containing the records of <strong>815 million Indian citizens</strong> leaked from the ICMR COVID-19 testing registry.
+      </p>
+      <p>
+        Leaked fields included valid Aadhaar numbers, PAN cards, dates of birth, and home addresses. Scammers use these authentic credentials to pass credit bureau name-matching tests with 100% compliance.
+      </p>
+    </section>
+
+    <!-- Chapter 3: Architecture & 5-Layer Physics -->
+    <section id="chapter-3">
+      <h2 class="chapter-heading"><span class="chapter-number">CH 3</span> System Architecture & 5-Layer Interaction Physics</h2>
+
+      <h3 class="section-heading">3.1 System Architecture Overview</h3>
+      <p>
+        ShadowGram ingests non-PII telemetry events over WebSockets, evaluates interaction physics across five layers, updates an in-memory adjacency graph, and executes community clustering.
+      </p>
+
+      <!-- SVG Diagram: ShadowGram Complete Architecture -->
+      <div class="diagram-card">
+        <div class="diagram-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+          Figure 3.1: ShadowGram End-to-End System Pipeline
+        </div>
+        <svg class="diagram-svg" viewBox="0 0 900 240" xmlns="http://www.w3.org/2000/svg">
+          <!-- Step 1: Ingress -->
+          <rect x="10" y="30" width="150" height="180" rx="8" fill="#160b2a" stroke="#a855f7" stroke-width="1.5"/>
+          <text x="25" y="60" fill="#a855f7" font-weight="700" font-size="12" font-family="sans-serif">STEP 1: INGRESS</text>
+          <text x="25" y="90" fill="#cbd5e1" font-size="11" font-family="sans-serif">• REST /telemetry</text>
+          <text x="25" y="115" fill="#cbd5e1" font-size="11" font-family="sans-serif">• WebSockets Live</text>
+          <text x="25" y="140" fill="#cbd5e1" font-size="11" font-family="sans-serif">• Zero-PII Buffer</text>
+          <text x="25" y="165" fill="#38bdf8" font-size="10" font-family="monospace">&lt; 50ms flush</text>
+
+          <line x1="160" y1="120" x2="190" y2="120" stroke="#06b6d4" stroke-width="2" marker-end="url(#arrow)"/>
+
+          <!-- Step 2: 5-Layer Physics -->
+          <rect x="190" y="30" width="220" height="180" rx="8" fill="#160b2a" stroke="#06b6d4" stroke-width="1.5"/>
+          <text x="205" y="60" fill="#06b6d4" font-weight="700" font-size="12" font-family="sans-serif">STEP 2: 5-LAYER PHYSICS</text>
+          <text x="205" y="85" fill="#cbd5e1" font-size="10" font-family="sans-serif">1. Temporal Rhythm (Δt)</text>
+          <text x="205" y="105" fill="#cbd5e1" font-size="10" font-family="sans-serif">2. FSM Sequence (LCS)</text>
+          <text x="205" y="125" fill="#cbd5e1" font-size="10" font-family="sans-serif">3. Kinetic Jerk (2D-CNN)</text>
+          <text x="205" y="145" fill="#cbd5e1" font-size="10" font-family="sans-serif">4. Semantic NLP (MiniLM)</text>
+          <text x="205" y="165" fill="#cbd5e1" font-size="10" font-family="sans-serif">5. Hardware Entropy</text>
+
+          <line x1="410" y1="120" x2="440" y2="120" stroke="#06b6d4" stroke-width="2"/>
+
+          <!-- Step 3: Graph Engine -->
+          <rect x="440" y="30" width="210" height="180" rx="8" fill="#160b2a" stroke="#a855f7" stroke-width="1.5"/>
+          <text x="455" y="60" fill="#a855f7" font-weight="700" font-size="12" font-family="sans-serif">STEP 3: GRAPH ENGINE</text>
+          <text x="455" y="90" fill="#cbd5e1" font-size="11" font-family="sans-serif">• Dynamic NetworkX</text>
+          <text x="455" y="115" fill="#cbd5e1" font-size="11" font-family="sans-serif">• Edge: S_comp ≥ 0.78</text>
+          <text x="455" y="140" fill="#cbd5e1" font-size="11" font-family="sans-serif">• Louvain Modularity</text>
+          <text x="455" y="165" fill="#10b981" font-size="10" font-family="monospace">Modularity Q &gt; 0.60</text>
+
+          <line x1="650" y1="120" x2="680" y2="120" stroke="#06b6d4" stroke-width="2"/>
+
+          <!-- Step 4: Defense & Action -->
+          <rect x="680" y="30" width="200" height="180" rx="8" fill="#160b2a" stroke="#10b981" stroke-width="1.5"/>
+          <text x="695" y="60" fill="#10b981" font-weight="700" font-size="12" font-family="sans-serif">STEP 4: INTERFACE & SAR</text>
+          <text x="695" y="90" fill="#cbd5e1" font-size="11" font-family="sans-serif">• 3D WebGL Galaxy</text>
+          <text x="695" y="115" fill="#cbd5e1" font-size="11" font-family="sans-serif">• "Why Card" Modal</text>
+          <text x="695" y="140" fill="#cbd5e1" font-size="11" font-family="sans-serif">• 1-Click Quarantine</text>
+          <text x="695" y="165" fill="#f59e0b" font-size="10" font-family="monospace">NVIDIA 2-Page SAR</text>
+        </svg>
+      </div>
+
+      <h3 class="section-heading">3.2 The 5 Composite Physics Layers</h3>
+
+      <h4>Layer 1: Temporal Rhythm ($S_{\text{time}}$)</h4>
+      <p>
+        Measures the inter-arrival delta $\Delta t$ between sequential form events across sessions. Coordinated bot runners dispatch requests in tight bursts ($\Delta t < 50\text{ms}$). Natural human arrivals follow an independent Poisson distribution.
+      </p>
+
+      <h4>Layer 2: Navigation Finite State Machine ($S_{\text{nav}}$)</h4>
+      <p>
+        Calculates the Longest Common Subsequence (LCS) across navigation paths (e.g. <code>/auth</code> $\to$ <code>/kyc</code> $\to$ <code>/submit</code>). Sessions with route similarity $\ge 0.85$ are flagged.
+      </p>
+
+      <h4>Layer 3: Kinetic Cursor Spectrogram Analysis ($S_{\text{kin}}$)</h4>
+      <div class="ste-rule">
+        <div class="ste-rule-title">Biomechanical Discovery: 8–12 Hz Physiological Tremor</div>
+        Human hands exhibit involuntary neuromotor tremor at 8 to 12 Hz. Bézier curves have smooth mathematical derivatives where jerk (the 3rd derivative $\frac{d^3x}{dt^3}$) is zero or constant.
+      </div>
+      <p>
+        We convert mouse paths $[x, y, t]$ into a 128x128 acceleration spectrogram image. A lightweight <strong>2D-CNN in ONNX Runtime</strong> evaluates the spectrogram in <strong>$< 10\text{ms}$ on CPU</strong>, outputting $P_{\text{synthetic}} \in [0.0, 1.0]$.
+      </p>
+
+      <h4>Layer 4: Dense Semantic Vector Forensics ($S_{\text{sem}}$)</h4>
+      <p>
+        Bots use LLMs to write loan explanations. The words are different, but the semantic concept is identical. We compute 384-dimensional dense vectors using local CPU model <code>all-MiniLM-L6-v2</code> ($< 15\text{ms}$):
+      </p>
+      <pre><code>Cosine_Similarity(A, B) = (A · B) / (||A|| ||B||) >= 0.88</code></pre>
+
+      <h4>Layer 5: Environmental Hardware Entropy ($S_{\text{env}}$)</h4>
+      <p>
+        Extracts non-PII hardware entropy signals: AudioContext oscillator decay, WebGL canvas render hashes, and system clock skew.
+      </p>
+
+      <h3 class="section-heading">3.3 Graph Community Detection (Louvain Modularity Math)</h3>
+      <p>
+        An edge $(u, v)$ is created if composite similarity $S_{\text{comp}} \ge 0.78$ across at least three layers:
+      </p>
+      <pre><code>S_comp(u, v) = w_time*S_time + w_nav*S_nav + w_sem*S_sem + w_kin*S_kin + w_env*S_env</code></pre>
+      <p>
+        We partition the graph using Newman-Girvan Modularity ($Q$):
+      </p>
+      <pre><code>Q = (1 / 2m) * sum_ij [ A_ij - (k_i * k_j) / (2m) ] * delta(c_i, c_j)</code></pre>
+      <p>
+        Any cluster with $Q > 0.60$ and node count $\ge 3$ is mathematically isolated as a syndicate ($P < 10^{-5}$).
+      </p>
+    </section>
+
+    <!-- Chapter 4: Legal & SAR -->
+    <section id="chapter-4">
+      <h2 class="chapter-heading"><span class="chapter-number">CH 4</span> Regulatory Compliance, Legal SAR Dossier & Safeguards</h2>
+
+      <h3 class="section-heading">4.1 Statutory Adverse Action: ECOA & Regulation B</h3>
+      <p>
+        The CFPB withdrew Circular 2023-03 on May 12, 2025 during an administrative cleanup. <strong>However, the underlying federal statute did not change.</strong>
+      </p>
+      <ul>
+        <li><strong>Equal Credit Opportunity Act (15 U.S.C. § 1691):</strong> Federal law passed by the United States Congress.</li>
+        <li><strong>Regulation B (12 CFR § 1002.9):</strong> Mandates that creditors provide specific, accurate principal reasons when taking adverse action.</li>
+        <li>Relying on an unexplained "88% Risk Score" creates direct regulatory and legal liability.</li>
+      </ul>
+
+      <h3 class="section-heading">4.2 Global Directives: EU AI Act & RBI Guidelines</h3>
+      <ul>
+        <li><strong>EU AI Act (Regulation (EU) 2024/1689):</strong> Annex III categorizes credit assessment AI as <strong>High-Risk AI Systems</strong>. Articles 13 & 14 mandate explainability and human oversight. Penalties reach <strong>€35 Million or 7% of global turnover</strong>.</li>
+        <li><strong>Reserve Bank of India (RBI) Digital Lending Master Directions:</strong> Banks cannot outsource core credit assessment to black-box software and must maintain audit logs for credit denials.</li>
+      </ul>
+
+      <h3 class="section-heading">4.3 Automated Legal SAR PDF Generation</h3>
+      <p>
+        When an officer quarantines a cluster, raw graph metrics are sent to the <strong>NVIDIA NIM API (Llama-3.3-70B)</strong>.
+      </p>
+      <p>
+        Llama-3.3-70B acts as the legal scribe, converting graph metrics into formal CFPB-compliant Adverse Action Reason Codes. Python <strong>ReportLab</strong> compiles a 2-page Suspicious Activity Report (SAR) PDF in under two seconds.
+      </p>
+
+      <h3 class="section-heading">4.4 False Positive Protection (The 3-Tier Safeguard)</h3>
+      <ol>
+        <li><strong>3-Layer Minimum Rule:</strong> An edge requires a match on $\ge 3$ layers. An authentic human applying during an attack fails the kinetic jerk and keystroke flight-time checks, keeping their node isolated.</li>
+        <li><strong>Zero Permanent Bans:</strong> ShadowGram never hard-deletes accounts. It issues a <strong>Quarantine / Step-Up Challenge</strong>.</li>
+        <li><strong>Friction-Free Escalation:</strong> Quarantined users complete a fast verification step (1-rupee UPI penny-drop or Account Aggregator consent). Genuine humans verify in ten seconds; headless bots fail and abandon.</li>
+      </ol>
+    </section>
+
+    <!-- Chapter 5: Hardware & Hotspot LAN -->
+    <section id="chapter-5">
+      <h2 class="chapter-heading"><span class="chapter-number">CH 5</span> Infrastructure, Hardware Specs & Hotspot LAN Setup</h2>
+
+      <h3 class="section-heading">5.1 Verified Lead Hardware Specifications (Station 2)</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Verified System Specification</th>
+              <th>Workload Capacity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>CPU</td>
+              <td>13th Gen Intel Core i5-13420H (12 vCPUs / threads)</td>
+              <td>Sub-millisecond FastAPI network dispatch & graph math</td>
+            </tr>
+            <tr>
+              <td>RAM</td>
+              <td>16 GB RAM (15 GiB physical + 16 GiB swap)</td>
+              <td>Only ~1.5 GB to 2 GB max required for ShadowGram</td>
+            </tr>
+            <tr>
+              <td>Dedicated GPU</td>
+              <td>NVIDIA GeForce RTX 2050 (4 GB VRAM)</td>
+              <td>Locked 60 FPS Three.js WebGL 3D galaxy & bloom shaders</td>
+            </tr>
+            <tr>
+              <td>Operating System</td>
+              <td>Linux (CachyOS Kernel 7.2.6)</td>
+              <td>Optimized Linux thread scheduling and low-latency networking</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="section-heading">5.2 The 4-Laptop Allocation Matrix</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Station</th>
+              <th>Assigned Member</th>
+              <th>Hardware Tier</th>
+              <th>Operating System</th>
+              <th>Assigned Software Workload</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Station 1</strong></td>
+              <td>Alan Alexander</td>
+              <td>🎮 Gaming Laptop #1 (Multi-Core CPU)</td>
+              <td>Windows</td>
+              <td>Runs <code>swarm_runner.py</code> (20 parallel Playwright browser contexts).</td>
+            </tr>
+            <tr>
+              <td><strong>Station 2</strong></td>
+              <td>YOU (Pete)</td>
+              <td>🎮 Gaming Laptop #2 (Dedicated GPU)</td>
+              <td>Linux</td>
+              <td>Runs FastAPI (<code>0.0.0.0:8000</code>), SQLite, NetworkX, ONNX CNN & 3D WebGL Cockpit.</td>
+            </tr>
+            <tr>
+              <td><strong>Station 3</strong></td>
+              <td>Aiswarya</td>
+              <td>💻 Normal Laptop #1 (Standard Specs)</td>
+              <td>Windows</td>
+              <td>Runs AthenaPay loan app (&lt;200MB RAM). Handed to a live judge.</td>
+            </tr>
+            <tr>
+              <td><strong>Station 4</strong></td>
+              <td>Mohammed Nihad / Ashlin</td>
+              <td>💻 Normal Laptop #2 (Standard Specs)</td>
+              <td>Windows</td>
+              <td>Runs compliance screen (&lt;300MB RAM) and downloads ReportLab SAR PDF.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="section-heading">5.3 Hotspot LAN Configuration (Google Pixel + Jio SIM)</h3>
+      <div class="ste-rule">
+        <div class="ste-rule-title">Mandatory Networking Rules</div>
+        1. <strong>FastAPI Binding:</strong> On Laptop 2, start FastAPI with <code>uvicorn main:app --host 0.0.0.0 --port 8000</code>. Binding to localhost blocks external laptops.<br>
+        2. <strong>IP Discovery:</strong> Run <code>hostname -I</code> on Linux to find your local IP (e.g. <code>192.168.43.2</code>). All laptops target this IP.<br>
+        3. <strong>Google Pixel Advantage:</strong> Stock Android does not enable AP client isolation. All laptops can ping each other.<br>
+        4. <strong>Zero Docker:</strong> Run Python venv and Node.js natively to avoid Windows WSL2 bridge network isolation.
+      </div>
+    </section>
+
+    <!-- Chapter 6: Roles & Checkpoints -->
+    <section id="chapter-6">
+      <h2 class="chapter-heading"><span class="chapter-number">CH 6</span> Atomic Role Assignments & Checkpoint Protocols</h2>
+
+      <h3 class="section-heading">6.1 Distribution of Files to Team Members</h3>
+      <ul>
+        <li><strong>Pete (Station 2):</strong> <code>ROLE_1_PRINCIPAL_ARCHITECT_YOU.md</code>, <code>00_CHECKPOINT_AND_INTEGRATION_PROTOCOL.md</code>, <code>01_MASTER_UNFILTERED_BLUEPRINT.md</code></li>
+        <li><strong>Aiswarya (Station 2 & 3):</strong> <code>ROLE_2_FRONTEND_3D_COMMAND_CENTER_AISWARYA.md</code>, <code>02_MASTER_FILTERED_TEAM_GUIDE.md</code>, <code>00_CHECKPOINT_AND_INTEGRATION_PROTOCOL.md</code></li>
+        <li><strong>Alan (Station 1):</strong> <code>ROLE_3_RED_TEAM_SWARM_AND_TELEMETRY.md</code>, <code>02_MASTER_FILTERED_TEAM_GUIDE.md</code>, <code>00_CHECKPOINT_AND_INTEGRATION_PROTOCOL.md</code></li>
+        <li><strong>Nihad / Ashlin (Station 4):</strong> <code>ROLE_4_DATA_NVIDIA_LLM_AND_LEGAL_SAR.md</code>, <code>02_MASTER_FILTERED_TEAM_GUIDE.md</code>, <code>00_CHECKPOINT_AND_INTEGRATION_PROTOCOL.md</code></li>
+      </ul>
+
+      <h3 class="section-heading">6.2 Anti-Hallucination Checkpoint Protocol</h3>
+      <p>
+        Every role file contains a mandatory instruction block for AI coding assistants (ChatGPT, Claude, Cursor).
+      </p>
+      <div class="ste-warning">
+        <div class="ste-warning-title">AI Coding Assistant Rules</div>
+        1. Never change frozen API endpoints or JSON payload keys.<br>
+        2. Never insert static mock data inside frontend components.<br>
+        3. At the end of every task, generate a <code>PROGRESS_CHECKPOINT_&lt;NAME&gt;.md</code> report summarizing modified files, test outputs, and code snippets.
+      </div>
+    </section>
+
+    <!-- Chapter 7: Live Pitch Guide -->
+    <section id="chapter-7">
+      <h2 class="chapter-heading"><span class="chapter-number">CH 7</span> Live Cyber-Range Demonstration & 3-Minute Pitch Script</h2>
+
+      <h3 class="section-heading">7.1 The 180-Second Live Pitch Script</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Timeline</th>
+              <th>Presenter</th>
+              <th>Physical Stage Action</th>
+              <th>Spoken Script / Core Message</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>0:00 – 0:45</strong><br>(The Threat Hook)</td>
+              <td>Pete</td>
+              <td>Points to Laptop 3 (AthenaPay). Invites a live judge to type their real name.</td>
+              <td><em>"Judges, autonomous AI swarms drained ₹20 Lakhs in 15 minutes from digital lenders. We invite you to step up to Laptop 3 and apply for an instant ₹10,000 loan as a genuine human."</em></td>
+            </tr>
+            <tr>
+              <td><strong>0:45 – 1:30</strong><br>(The Live Swarm Attack)</td>
+              <td>Alan</td>
+              <td>Presses Enter on Laptop 1. Spawns 20 parallel Playwright bots attacking the loan app.</td>
+              <td><em>"While the judge types, my laptop dispatches 20 autonomous bots across our local network. On Laptop 2's screen, you see red connection lines snap across the bot swarm in real time!"</em></td>
+            </tr>
+            <tr>
+              <td><strong>1:30 – 2:15</strong><br>(The Visual Proof)</td>
+              <td>Aiswarya</td>
+              <td>Points to Laptop 2. Clicks the red cluster to open the "Why Card".</td>
+              <td><em>"Look at the screen: the judge's node is glowing green, calm and unaffected. The 20 bots are clustered. Clicking the cluster reveals the Why Card with arrival Δt, route overlap, and semantic similarity."</em></td>
+            </tr>
+            <tr>
+              <td><strong>2:15 – 3:00</strong><br>(The Legal Kill-Switch)</td>
+              <td>Nihad / Pete</td>
+              <td>Clicks [ 1-Click Quarantine ] and [ Export SAR ] on Laptop 4.</td>
+              <td><em>"With one click, we quarantine the entire syndicate. We export an official 2-page SAR PDF powered by NVIDIA NIM for regulators. Zero cloud bills. 100% explainable."</em></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="section-heading">7.2 Multi-Tier Failsafe Architecture</h3>
+      <p>
+        If venue Wi-Fi fails or an API times out:
+      </p>
+      <ul>
+        <li><strong>Tier 1 (Normal):</strong> Live calls to NVIDIA NIM API over local mobile hotspot.</li>
+        <li><strong>Tier 2 (Offline Cache):</strong> Local JSON cache (<code>personas_cache.json</code>) and pre-baked legal report template generate the SAR PDF instantly without internet.</li>
+        <li><strong>Tier 3 (Emergency):</strong> Prominent <code>[ 🔥 Deploy Swarm Simulation ]</code> button on Laptop 2 runs the entire 20-bot attack and defense in-memory in three seconds.</li>
+      </ul>
+    </section>
+
+    <!-- Appendix -->
+    <section id="appendix">
+      <h2 class="chapter-heading"><span class="chapter-number">APP</span> Master Glossary & Reference Bibliography</h2>
+
+      <h3 class="section-heading">Master Glossary (ASD-STE100 Technical Terms)</h3>
+      <ul>
+        <li><strong>Autonomous AI Swarm:</strong> A group of software agents that coordinate actions across multiple accounts without human control.</li>
+        <li><strong>Synthetic Identity:</strong> A fabricated identity made by combining authentic government identification numbers with fabricated personal data.</li>
+        <li><strong>Kinetic Jerk:</strong> The third mathematical derivative of position with respect to time ($d^3x/dt^3$). Measures the rate of change of acceleration.</li>
+        <li><strong>Louvain Modularity ($Q$):</strong> A mathematical algorithm that measures the density of links inside communities compared to links between communities.</li>
+        <li><strong>Denial-of-Wallet (DoW):</strong> A cyber-attack that forces an organization to spend financial resources on third-party API verification fees.</li>
+        <li><strong>Why Card:</strong> An interface window that displays verifiable factual evidence explaining why accounts were grouped into a cluster.</li>
+      </ul>
+
+      <h3 class="section-heading">Authoritative Reference Bibliography</h3>
+      <ol>
+        <li>USENIX Security 2024: <em>The Threat of Vision-Language Models to CAPTCHAs</em>.</li>
+        <li>Black Hat Europe / DEF CON 31: <em>Bypassing Modern Bot Detection with Ghost-Cursor</em>.</li>
+        <li>Radware 2024: <em>State of Web Application and Bot Management Report</em>.</li>
+        <li>404 Media (Joseph Cox, Feb 2024): <em>Inside the AI-Powered Fake ID Service Used to Bypass KYC</em>.</li>
+        <li>Resecurity (Oct 2023): <em>Data of 815 Million Indian Citizens Leaked on Dark Web</em>.</li>
+        <li>Sift Science (2024): <em>Digital Trust & Safety Index: Buy Now, Pay Later Fraud Surge</em>.</li>
+        <li>Equal Credit Opportunity Act (ECOA): <em>15 U.S.C. § 1691 & Regulation B (12 CFR § 1002.9)</em>.</li>
+        <li>European Union Artificial Intelligence Act: <em>Regulation (EU) 2024/1689 (Annex III, Articles 13 & 14)</em>.</li>
+        <li>Reserve Bank of India (RBI): <em>Guidelines on Digital Lending (RBI/2022-23/111)</em>.</li>
+        <li>Newman, M. E. J., & Girvan, M. (2004): <em>Finding and evaluating community structure in networks</em>.</li>
+        <li>Blondel, V. D., et al. (2008): <em>Fast unfolding of communities in large networks (Louvain Method)</em>.</li>
+        <li>Elble, R. J., & Randall, J. E. (1976): <em>Mechanisms of Physiological Tremor (8–12 Hz)</em>.</li>
+      </ol>
+    </section>
+
+  </main>
+
+  <script>
+    function filterContent() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const sections = document.querySelectorAll('section');
+
+      sections.forEach(section => {
+        const text = section.innerText.toLowerCase();
+        if (text.includes(query) || query === '') {
+          section.style.display = 'block';
+        } else {
+          section.style.display = 'none';
+        }
+      });
+    }
+
+    // Scrollspy for sidebar active links
+    window.addEventListener('scroll', () => {
+      const sections = document.querySelectorAll('section');
+      const navLinks = document.querySelectorAll('.nav-link');
+      let currentSectionId = '';
+
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop - 120;
+        if (window.scrollY >= sectionTop) {
+          currentSectionId = section.getAttribute('id');
+        }
+      });
+
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${currentSectionId}`) {
+          link.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

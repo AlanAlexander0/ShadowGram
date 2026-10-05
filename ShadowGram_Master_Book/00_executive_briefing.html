@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SHADOWGRAM: Operational Master Blueprint, Empirical Evidence & Live Execution Manual</title>
+  <style>
+    :root {
+      --bg-dark: #070312;
+      --bg-surface: rgba(22, 11, 42, 0.85);
+      --bg-card: rgba(30, 15, 58, 0.65);
+      --border-color: rgba(168, 85, 247, 0.25);
+      --border-glow: rgba(6, 182, 212, 0.4);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent-cyan: #06b6d4;
+      --accent-purple: #a855f7;
+      --accent-red: #ef4444;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      font-size: 15px;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Navigation */
+    #sidebar {
+      width: 320px;
+      background: rgba(12, 6, 26, 0.95);
+      backdrop-filter: blur(16px);
+      border-right: 1px solid var(--border-color);
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      overflow-y: auto;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+
+    .brand-header {
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-badge {
+      font-size: 10px;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+      color: white;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .brand-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .search-box {
+      margin-bottom: 20px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text-main);
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
+    }
+
+    .nav-group-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent-cyan);
+      font-weight: 700;
+      margin: 18px 0 8px 8px;
+    }
+
+    .nav-list {
+      list-style: none;
+    }
+
+    .nav-item {
+      margin-bottom: 4px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: #ffffff;
+      background: rgba(168, 85, 247, 0.15);
+      border-left: 3px solid var(--accent-cyan);
+      padding-left: 9px;
+    }
+
+    .ste-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+
+    /* Main Content Area */
+    #content {
+      flex: 1;
+      padding: 40px 60px;
+      max-width: 1200px;
+      overflow-y: auto;
+    }
+
+    /* Technical Callouts & ASD-STE100 Style Boxes */
+    .ste-note {
+      background: rgba(6, 182, 212, 0.08);
+      border-left: 4px solid var(--accent-cyan);
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 24px 0;
+      font-size: 14px;
+    }
+
+    .ste-note-title {
+      font-weight: 700;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .ste-warning {
+      background: rgba(239, 68, 68, 0.08);
+      border-left: 4px solid var(--accent-red);
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 24px 0;
+      font-size: 14px;
+    }
+
+    .ste-warning-title {
+      font-weight: 700;
+      color: var(--accent-red);
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .ste-rule {
+      background: rgba(168, 85, 247, 0.08);
+      border-left: 4px solid var(--accent-purple);
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 24px 0;
+      font-size: 14px;
+    }
+
+    .ste-rule-title {
+      font-weight: 700;
+      color: var(--accent-purple);
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    /* Headings */
+    h1.doc-title {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    .doc-meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 40px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .meta-tag {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 4px 10px;
+      border-radius: 6px;
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    h2.chapter-heading {
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 50px 0 20px 0;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .chapter-number {
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+      color: white;
+      font-size: 14px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    h3.section-heading {
+      font-size: 19px;
+      font-weight: 600;
+      color: var(--accent-cyan);
+      margin: 32px 0 14px 0;
+    }
+
+    h4.subsection-heading {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--accent-purple);
+      margin: 24px 0 10px 0;
+    }
+
+    p {
+      margin-bottom: 16px;
+      color: #cbd5e1;
+    }
+
+    ul, ol {
+      margin: 12px 0 20px 28px;
+      color: #cbd5e1;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    /* Data Tables */
+    .table-container {
+      overflow-x: auto;
+      margin: 24px 0;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      background: rgba(30, 15, 58, 0.9);
+      color: var(--accent-cyan);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(168, 85, 247, 0.12);
+      color: #e2e8f0;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(168, 85, 247, 0.05);
+    }
+
+    /* Code Blocks */
+    pre {
+      background: #04010a;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px 20px;
+      overflow-x: auto;
+      margin: 20px 0;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: #38bdf8;
+      line-height: 1.5;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      background: rgba(168, 85, 247, 0.15);
+      color: #e0e7ff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    /* Diagram Containers */
+    .diagram-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 28px 0;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .diagram-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent-purple);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    svg.diagram-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Buttons */
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--accent-purple), #7c3aed);
+      color: white;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .btn-action:hover {
+      box-shadow: 0 0 16px rgba(168, 85, 247, 0.4);
+      transform: translateY(-1px);
+    }
+
+    /* Print Stylesheet */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        font-size: 11pt;
+      }
+
+      #sidebar, .btn-action, .search-box {
+        display: none !important;
+      }
+
+      #content {
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
+
+      .chapter-heading {
+        page-break-before: always;
+        color: #0f172a !important;
+        border-bottom: 2px solid #cbd5e1 !important;
+      }
+
+      .ste-note, .ste-warning, .ste-rule {
+        border-left-width: 4px !important;
+        background: #f8fafc !important;
+        color: #0f172a !important;
+      }
+
+      .diagram-card {
+        background: #f8fafc !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+      }
+
+      table {
+        border: 1px solid #cbd5e1 !important;
+      }
+
+      th {
+        background: #e2e8f0 !important;
+        color: #0f172a !important;
+      }
+
+      td {
+        color: #1e293b !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+      }
+
+      pre {
+        background: #f1f5f9 !important;
+        color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important;
+        page-break-inside: avoid;
+      }
+
+      code {
+        color: #0f172a !important;
+        background: #e2e8f0 !important;
+      }
+    }
+  </style>
+</head>
+<body style="display: block; max-width: 960px; margin: 0 auto; padding: 40px 20px;">
+  <div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+    <a href="ShadowGram_Master_Book_Complete.html" style="color: var(--accent-cyan); text-decoration: none; font-size: 13px; font-weight: 600;">← Back to Complete Master Book</a>
+    <span class="meta-tag">SHADOWGRAM ASD-STE100 BOOK</span>
+    <button onclick="window.print()" class="btn-action" style="padding: 6px 12px; font-size: 12px;">Print Chapter</button>
+  </div>
+  <section id="chapter-0">
+      <h2 class="chapter-heading"><span class="chapter-number">CH 0</span> Executive Briefing & The 60-Second Mental Model</h2>
+
+      <div class="ste-note">
+        <div class="ste-note-title">Simplified Technical English (ASD-STE100) Notice</div>
+        This document uses ASD-STE100 rules for technical writing. Sentences are short and direct. Active voice is used. Every term has one specific technical meaning. This ensures zero ambiguity during team execution and judge evaluation.
+      </div>
+
+      <h3 class="section-heading">0.1 The Problem in Plain Words</h3>
+      <p>
+        Modern scammers do not use simple scripted bots. Scammers use autonomous multi-agent AI swarms. Each bot uses a different name, a different ChatGPT bio, and a clean home Wi-Fi IP address.
+      </p>
+      <p>
+        Traditional fraud security inspects accounts one by one. The security system asks: <em>"Does Account A look fake?"</em>
+      </p>
+      <p>
+        Because each bot looks human in isolation, the security system approves all 50 accounts. The bots take instant micro-loans and vanish together.
+      </p>
+      <div class="ste-rule">
+        <div class="ste-rule-title">Core Axiom of ShadowGram</div>
+        The fraud does not live inside any single account. The fraud lives in the hidden statistical relationship between accounts.
+      </div>
+
+      <h3 class="section-heading">0.2 How ShadowGram Solves the Problem</h3>
+      <p>
+        ShadowGram does not evaluate accounts in isolation. ShadowGram watches the entire system from above:
+      </p>
+      <ol>
+        <li>It records five layers of interaction physics: arrival timing ($\Delta t$), route sequence, mouse acceleration jerk, semantic loan meaning, and hardware entropy.</li>
+        <li>It creates an in-memory graph where accounts are nodes and behavioral similarities are edges.</li>
+        <li>It uses the <strong>Louvain Modularity Algorithm</strong> to identify the entire coordinated syndicate as a tightly linked cluster.</li>
+        <li>It shows an explainable <strong>"Why Card"</strong> with mathematical facts, letting bank officers freeze the whole syndicate with one click.</li>
+      </ol>
+
+      <!-- SVG Diagram: Single Account vs Relational Graph -->
+      <div class="diagram-card">
+        <div class="diagram-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+          Figure 0.1: Legacy Inspection vs. ShadowGram Relational Graph Architecture
+        </div>
+        <svg class="diagram-svg" viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg">
+          <!-- Background Split -->
+          <rect x="10" y="10" width="425" height="300" rx="8" fill="#120826" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <text x="30" y="40" fill="#ef4444" font-weight="700" font-size="14" font-family="sans-serif">LEGACY DEFENSE (Single Account Siloed Inspection)</text>
+
+          <!-- Legacy Nodes -->
+          <circle cx="90" cy="110" r="28" fill="#1e1b4b" stroke="#ef4444" stroke-width="2"/>
+          <text x="75" y="115" fill="#f8fafc" font-size="11" font-family="sans-serif">Bot #1</text>
+          <text x="50" y="155" fill="#10b981" font-size="11" font-weight="700" font-family="sans-serif">✓ Approved</text>
+
+          <circle cx="220" cy="110" r="28" fill="#1e1b4b" stroke="#ef4444" stroke-width="2"/>
+          <text x="205" y="115" fill="#f8fafc" font-size="11" font-family="sans-serif">Bot #2</text>
+          <text x="180" y="155" fill="#10b981" font-size="11" font-weight="700" font-family="sans-serif">✓ Approved</text>
+
+          <circle cx="350" cy="110" r="28" fill="#1e1b4b" stroke="#ef4444" stroke-width="2"/>
+          <text x="335" y="115" fill="#f8fafc" font-size="11" font-family="sans-serif">Bot #3</text>
+          <text x="310" y="155" fill="#10b981" font-size="11" font-weight="700" font-family="sans-serif">✓ Approved</text>
+
+          <rect x="30" y="200" width="385" height="90" rx="6" fill="#1f1138"/>
+          <text x="45" y="225" fill="#f87171" font-size="12" font-weight="700" font-family="sans-serif">Blindspot Detected:</text>
+          <text x="45" y="248" fill="#cbd5e1" font-size="11" font-family="sans-serif">• Evaluates each user without context.</text>
+          <text x="45" y="268" fill="#cbd5e1" font-size="11" font-family="sans-serif">• Clean residential IPs and unique bios bypass all filters.</text>
+
+          <!-- Right Side: ShadowGram -->
+          <rect x="465" y="10" width="425" height="300" rx="8" fill="#120826" stroke="#06b6d4" stroke-width="2"/>
+          <text x="485" y="40" fill="#06b6d4" font-weight="700" font-size="14" font-family="sans-serif">SHADOWGRAM (Relational Graph Topology)</text>
+
+          <!-- Connected Graph -->
+          <line x1="560" y1="120" x2="680" y2="90" stroke="#ef4444" stroke-width="3"/>
+          <line x1="680" y1="90" x2="640" y2="170" stroke="#ef4444" stroke-width="3"/>
+          <line x1="640" y1="170" x2="560" y2="120" stroke="#ef4444" stroke-width="3"/>
+
+          <!-- Cluster boundary -->
+          <ellipse cx="625" cy="125" rx="95" ry="65" fill="rgba(239, 68, 68, 0.15)" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="3 3"/>
+
+          <!-- Bot Nodes -->
+          <circle cx="560" cy="120" r="22" fill="#450a0a" stroke="#ef4444" stroke-width="2"/>
+          <text x="548" y="124" fill="#ffffff" font-size="10" font-family="sans-serif">B-01</text>
+
+          <circle cx="680" cy="90" r="22" fill="#450a0a" stroke="#ef4444" stroke-width="2"/>
+          <text x="668" y="94" fill="#ffffff" font-size="10" font-family="sans-serif">B-02</text>
+
+          <circle cx="640" cy="170" r="22" fill="#450a0a" stroke="#ef4444" stroke-width="2"/>
+          <text x="628" y="174" fill="#ffffff" font-size="10" font-family="sans-serif">B-03</text>
+
+          <!-- Genuine Human Node -->
+          <circle cx="810" cy="130" r="24" fill="#064e3b" stroke="#10b981" stroke-width="2"/>
+          <text x="795" y="134" fill="#ffffff" font-size="10" font-family="sans-serif">Human</text>
+          <text x="780" y="175" fill="#10b981" font-size="10" font-weight="700" font-family="sans-serif">Safe & Clear</text>
+
+          <rect x="485" y="210" width="385" height="85" rx="6" fill="#1f1138"/>
+          <text x="500" y="232" fill="#38bdf8" font-size="12" font-weight="700" font-family="sans-serif">Louvain Community Isolated:</text>
+          <text x="500" y="252" fill="#cbd5e1" font-size="11" font-family="sans-serif">• Modularity Q = 0.72 (P < 10⁻⁵). Synchronized timing & routes.</text>
+          <text x="500" y="272" fill="#cbd5e1" font-size="11" font-family="sans-serif">• Quarantines all 3 bots with 1 click; genuine human stays open.</text>
+        </svg>
+      </div>
+    </section>
+  <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center; font-size: 13px; color: var(--text-muted);">
+    ShadowGram Operational Master Blueprint • Chapter File: 00_executive_briefing.html
+  </div>
+</body>
+</html>
