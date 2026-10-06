@@ -104,6 +104,8 @@ class GraphLink(BaseModel):
     weight: float
     converged_layers: List[str]  # timing, navigation, semantic, kinetics, environment
     delta_t_seconds: float
+    evidence: Optional[Dict[str, float]] = None
+    common_cause_discount: float = 0.0
 
 
 class GraphCluster(BaseModel):

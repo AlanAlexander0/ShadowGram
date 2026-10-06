@@ -233,7 +233,17 @@ class ShadowGraphEngine:
         w = {"timing": 0.25, "navigation": 0.25, "semantic": 0.25, "kinetics": 0.15, "environment": 0.10}
         composite_score = sum(w[k] * layer_scores[k] for k in w)
 
-        return round(composite_score, 4), converged_layers, round(delta_t, 4)
+        # Common-Cause Adjustment (Flash Crowds / Campus Wi-Fi):
+        # If two sessions share network IP / campus environment, but have divergent navigation routes
+        # or semantic text, down-weight similarity so legitimate crowd correlation is not classified as coordination.
+        common_cause_discount = 0.0
+        if u.ip_hash and v.ip_hash and u.ip_hash == v.ip_hash:
+            if s_nav < 0.60 or s_sem < 0.60:
+                common_cause_discount = 0.20
+
+        final_composite_score = max(0.0, composite_score - common_cause_discount)
+
+        return round(final_composite_score, 4), converged_layers, round(delta_t, 4), layer_scores, round(common_cause_discount, 4)
 
     def recompute_node_edges(self, account_id: str) -> None:
         """Re-evaluates edges connecting account_id with other active sessions."""
@@ -245,7 +255,7 @@ class ShadowGraphEngine:
             if other_id == account_id:
                 continue
 
-            comp_score, converged, delta_t = self.calculate_pairwise_similarity(u, v)
+            comp_score, converged, delta_t, evidence_dict, cc_discount = self.calculate_pairwise_similarity(u, v)
 
             # 3-Layer Orthogonal Sparsification Filter:
             # Instantiate edge ONLY if composite score >= 0.78 AND at least 3 layers converge!
@@ -254,7 +264,9 @@ class ShadowGraphEngine:
                     account_id, other_id,
                     weight=comp_score,
                     converged=converged,
-                    delta_t=delta_t
+                    delta_t=delta_t,
+                    evidence=evidence_dict,
+                    common_cause_discount=cc_discount
                 )
             elif self.graph.has_edge(account_id, other_id):
                 self.graph.remove_edge(account_id, other_id)
@@ -449,7 +461,9 @@ class ShadowGraphEngine:
                 target=v,
                 weight=round(data.get("weight", 0.8), 4),
                 converged_layers=data.get("converged", ["timing", "navigation"]),
-                delta_t_seconds=round(data.get("delta_t", 0.05), 4)
+                delta_t_seconds=round(data.get("delta_t", 0.05), 4),
+                evidence=data.get("evidence"),
+                common_cause_discount=round(data.get("common_cause_discount", 0.0), 4)
             ))
 
         display_global_q = max(q_score, max([c.modularity_q for c in clusters_out], default=0.0))
