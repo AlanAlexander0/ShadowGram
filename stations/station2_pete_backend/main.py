@@ -425,4 +425,14 @@ async def serve_master_book():
         return FileResponse(path, media_type="text/html")
     raise HTTPException(status_code=404, detail="Master Book not found")
 
+@app.get("/mathematical_deep_dive.html", include_in_schema=False)
+@app.get("/math", include_in_schema=False)
+async def serve_mathematical_deep_dive():
+    """Serves the Mathematical & Detection Deep Dive HTML specification."""
+    path = os.path.join(PUBLIC_DIR, "mathematical_deep_dive.html")
+    if os.path.exists(path):
+        return FileResponse(path, media_type="text/html")
+    raise HTTPException(status_code=404, detail="Mathematical deep dive HTML not found")
+
+
 
