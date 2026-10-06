@@ -7,7 +7,7 @@ from typing import List, Dict, Any, Set
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Depends, Header, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import PlainTextResponse, JSONResponse, Response
+from fastapi.responses import PlainTextResponse, JSONResponse, Response, FileResponse, RedirectResponse
 from sqlalchemy.orm import Session
 
 try:
@@ -57,7 +57,7 @@ app.add_middleware(
 )
 
 # Global Engines
-graph_engine = ShadowGraphEngine(window_seconds=600.0, edge_threshold=0.78)
+graph_engine = ShadowGraphEngine(window_seconds=600.0, edge_threshold=0.70)
 SHARED_HMAC_SALT = os.getenv("SHADOWGRAM_SALT", "shadowgram-2026-secret-salt").encode()
 
 # WebSocket Connection Manager
@@ -371,3 +371,58 @@ async def websocket_endpoint(websocket: WebSocket):
         ws_manager.disconnect(websocket)
     except Exception:
         ws_manager.disconnect(websocket)
+
+
+# ---------------------------------------------------------
+# Static Asset Handlers & LAN Cockpit Serving
+# ---------------------------------------------------------
+
+PUBLIC_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "public")
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    """Silent 204 response to eliminate browser favicon 404 noise."""
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@app.get("/cockpit.html", include_in_schema=False)
+async def serve_cockpit():
+    """Serves the 3D WebGL Cockpit directly across the Hotspot LAN."""
+    path = os.path.join(PUBLIC_DIR, "cockpit.html")
+    if os.path.exists(path):
+        return FileResponse(path, media_type="text/html")
+    raise HTTPException(status_code=404, detail="cockpit.html not found")
+
+@app.get("/athenapay_portal.html", include_in_schema=False)
+async def serve_athenapay_portal():
+    """Serves the AthenaPay Borrower Application directly across the Hotspot LAN."""
+    path = os.path.join(PUBLIC_DIR, "athenapay_portal.html")
+    if os.path.exists(path):
+        return FileResponse(path, media_type="text/html")
+    raise HTTPException(status_code=404, detail="athenapay_portal.html not found")
+
+@app.get("/telemetry.js", include_in_schema=False)
+async def serve_telemetry_js():
+    """Serves client telemetry SDK directly across the Hotspot LAN."""
+    path = os.path.join(PUBLIC_DIR, "telemetry.js")
+    if os.path.exists(path):
+        return FileResponse(path, media_type="application/javascript")
+    raise HTTPException(status_code=404, detail="telemetry.js not found")
+
+@app.get("/", include_in_schema=False)
+async def root_redirect():
+    """Root redirect directly into the 3D Cockpit."""
+    return RedirectResponse(url="/cockpit.html")
+
+BOOK_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "ShadowGram_Master_Book")
+
+@app.get("/master_book.html", include_in_schema=False)
+@app.get("/book", include_in_schema=False)
+@app.get("/book/index.html", include_in_schema=False)
+async def serve_master_book():
+    """Serves the complete 80-page Master Blueprint and Empirical Evidence Book."""
+    path = os.path.join(BOOK_DIR, "ShadowGram_Master_Book_Complete.html")
+    if os.path.exists(path):
+        return FileResponse(path, media_type="text/html")
+    raise HTTPException(status_code=404, detail="Master Book not found")
+
+

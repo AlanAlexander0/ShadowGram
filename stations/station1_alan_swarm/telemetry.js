@@ -17,7 +17,7 @@
 
   // --- Configuration ---
   const config = window.__SHADOWGRAM_CONFIG__ || {};
-  const BACKEND_ENDPOINT = config.endpoint || 'http://localhost:8000/telemetry';
+  const BACKEND_ENDPOINT = config.endpoint || (window.location.origin.startsWith('http') ? window.location.origin + '/telemetry' : 'http://localhost:8000/telemetry');
   const FLUSH_INTERVAL_MS = config.flushIntervalMs || 1000;
   const POINTER_THROTTLE_MS = 50;
   const SESSION_SALT = config.sessionSalt || 'shadowgram-hackathena-2026-salt';

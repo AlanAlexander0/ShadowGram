@@ -52,10 +52,15 @@
       <span style="font-size:0.65rem; background:#1e293b; color:#94a3b8; padding:0.2rem 0.5rem; border-radius:0.3rem; margin-left:0.5rem;">STATION 2 & 3 COCKPIT</span>
     </div>
     <div class="nav-stats">
-      <div class="stat-pill">Nodes: <span id="stat-nodes" class="stat-val-green">100</span></div>
-      <div class="stat-pill">Modularity Q: <span id="stat-q" class="stat-val-gold">0.7241</span></div>
-      <div class="stat-pill">Null Permutation: <span id="stat-p" class="stat-val-red">p &lt; 0.001</span></div>
+      <div class="stat-pill">Nodes: <span id="stat-nodes" class="stat-val-green">0</span></div>
+      <div class="stat-pill">Modularity Q: <span id="stat-q" class="stat-val-gold">0.0000</span></div>
+      <div class="stat-pill">Null Permutation: <span id="stat-p" class="stat-val-red">Awaiting Ingress</span></div>
       <div class="stat-pill">LAN Ingress: <span style="color:#06b6d4;">0.0.0.0:8000</span></div>
+      <a href="/master_book.html" target="_blank" style="text-decoration:none;">
+        <div class="stat-pill" style="background:linear-gradient(135deg, rgba(168,85,247,0.25), rgba(6,182,212,0.25)); border:1px solid #a855f7; color:#f1f5f9; cursor:pointer; font-weight:700;">
+          📚 Master Blueprint &amp; Audit Book
+        </div>
+      </a>
     </div>
   </header>
 
@@ -66,6 +71,7 @@
         <button onclick="triggerQuarantine()" class="btn-action btn-quarantine">🛑 1-Click Quarantine</button>
         <button onclick="openWhyCard()" class="btn-action">🔍 Inspect Why Card</button>
         <button onclick="exportSarPdf()" class="btn-action">📄 Export SAR PDF</button>
+        <button onclick="window.open('/master_book.html', '_blank')" class="btn-action">📚 Master Book</button>
         <button onclick="resetGraph()" class="btn-action">🔄 Reset</button>
       </div>
       <canvas id="graphCanvas"></canvas>
@@ -187,46 +193,122 @@
       nodes = [];
       links = [];
       for (let i = 0; i < 80; i++) {
-        nodes.push({
-          id: `HUMAN-${1000 + i}`,
-          x: Math.random() * width,
-          y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.4,
-          vy: (Math.random() - 0.5) * 0.4,
-          type: 'human',
-          color: '#38bdf8',
-          radius: 3.5
-        });
+    const nodeMap = new Map();
+
+    async function fetchGraphData() {
+      try {
+        const resp = await fetch('/api/graph');
+        if (!resp.ok) return;
+        const data = await resp.json();
+        applyGraphUpdate(data);
+      } catch (err) {
+        console.warn('Graph sync error:', err);
       }
-      const cx = width * 0.6;
-      const cy = height * 0.45;
-      const botIndices = [];
-      for (let j = 0; j < 20; j++) {
-        const idx = nodes.length;
-        botIndices.push(idx);
-        nodes.push({
-          id: `BOT-${89400 + j}`,
-          x: cx + (Math.random() - 0.5) * 120,
-          y: cy + (Math.random() - 0.5) * 120,
-          vx: (Math.random() - 0.5) * 0.2,
-          vy: (Math.random() - 0.5) * 0.2,
-          type: 'bot',
-          color: '#ef4444',
-          radius: 5
-        });
+    }
+
+    function applyGraphUpdate(data) {
+      if (!data) return;
+      const backendNodes = data.nodes || [];
+      const backendLinks = data.links || [];
+      const clusters = data.clusters || [];
+      const modQ = data.global_modularity || 0;
+
+      document.getElementById('stat-nodes').textContent = backendNodes.length;
+      document.getElementById('stat-q').textContent = modQ > 0 ? modQ.toFixed(4) : "0.0000";
+      
+      let totalDow = 0;
+      if (clusters.length > 0) {
+        document.getElementById('stat-p').textContent = "p < 0.001 (Empirical)";
+        for (let c of clusters) {
+          totalDow += (c.dow_savings_inr || (c.size * 61.0));
+        }
+      } else {
+        document.getElementById('stat-p').textContent = backendNodes.length > 0 ? "Analyzing..." : "Awaiting Ingress";
       }
-      for (let a = 0; a < botIndices.length; a++) {
-        for (let b = a + 1; b < botIndices.length; b++) {
-          if (Math.random() > 0.4) {
-            links.push({ source: botIndices[a], target: botIndices[b] });
+      document.getElementById('dow-total').textContent = '₹' + totalDow.toFixed(2);
+
+      if (backendNodes.length === 0) {
+        nodes = [];
+        links = [];
+        nodeMap.clear();
+        return;
+      }
+
+      const activeIds = new Set();
+      const updatedNodes = [];
+
+      for (let bn of backendNodes) {
+        activeIds.add(bn.id);
+        let n = nodeMap.get(bn.id);
+        const isBot = bn.cluster_id !== null || bn.risk_label === 'bot_swarm' || bn.key1_status === 'flagged_automation' || bn.status === 'quarantined';
+        const isQuarantined = bn.status === 'quarantined';
+
+        if (!n) {
+          let nx, ny;
+          if (isBot) {
+            const cx = width * 0.58;
+            const cy = height * 0.48;
+            nx = cx + (Math.random() - 0.5) * 160;
+            ny = cy + (Math.random() - 0.5) * 160;
+          } else {
+            nx = width * 0.15 + Math.random() * (width * 0.7);
+            ny = height * 0.15 + Math.random() * (height * 0.7);
           }
+          n = {
+            id: bn.id,
+            x: nx,
+            y: ny,
+            vx: (Math.random() - 0.5) * (isBot ? 0.2 : 0.4),
+            vy: (Math.random() - 0.5) * (isBot ? 0.2 : 0.4),
+            type: isBot ? 'bot' : 'human',
+            color: isQuarantined ? '#f59e0b' : (isBot ? '#ef4444' : '#38bdf8'),
+            radius: isBot ? 5.5 : 3.5,
+            data: bn
+          };
+          nodeMap.set(bn.id, n);
+        } else {
+          n.data = bn;
+          n.type = isBot ? 'bot' : 'human';
+          n.color = isQuarantined ? '#f59e0b' : (isBot ? '#ef4444' : '#38bdf8');
+          n.radius = isBot ? 5.5 : 3.5;
+        }
+        updatedNodes.push(n);
+      }
+
+      for (let id of Array.from(nodeMap.keys())) {
+        if (!activeIds.has(id)) {
+          nodeMap.delete(id);
+        }
+      }
+      nodes = updatedNodes;
+
+      const idToIndex = new Map();
+      nodes.forEach((n, idx) => idToIndex.set(n.id, idx));
+
+      links = [];
+      for (let bl of backendLinks) {
+        const sIdx = idToIndex.get(bl.source);
+        const tIdx = idToIndex.get(bl.target);
+        if (sIdx !== undefined && tIdx !== undefined) {
+          links.push({ source: sIdx, target: tIdx, weight: bl.weight || 0.8 });
         }
       }
     }
-    initMockNodes();
+
+    fetchGraphData();
+    setInterval(fetchGraphData, 1500);
 
     function animate() {
       ctx.clearRect(0, 0, width, height);
+
+      if (nodes.length === 0) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(148, 163, 184, 0.45)';
+        ctx.font = '13px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('⚡ AWAITING INGRESS TELEMETRY FROM SWARM OR ATHENAPAY ⚡', width / 2, height / 2);
+        ctx.restore();
+      }
 
       ctx.lineWidth = 1.2;
       ctx.strokeStyle = 'rgba(239, 68, 68, 0.45)';
@@ -262,42 +344,42 @@
 
     async function deploySimulation() {
       try {
-        const resp = await fetch('http://localhost:8000/api/simulate_swarm', { method: 'POST' });
+        const resp = await fetch('/api/simulate_swarm', { method: 'POST' });
         const data = await resp.json();
-        document.getElementById('stat-q').textContent = (data.modularity_q || 0.7241).toFixed(4);
-        initMockNodes();
+        await fetchGraphData();
       } catch (e) {
-        initMockNodes();
+        console.warn('Simulation trigger:', e);
       }
     }
 
     async function triggerQuarantine() {
       try {
-        const resp = await fetch('http://localhost:8000/api/quarantine', {
+        const resp = await fetch('/api/quarantine', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ cluster_id: 1, action: 'isolate' })
         });
         const data = await resp.json();
-        for (let n of nodes) {
-          if (n.type === 'bot') n.color = '#f59e0b';
-        }
+        await fetchGraphData();
         alert(`Syndicate quarantined! ${data.quarantined_accounts || 20} accounts isolated.\nINR ${data.dow_savings_inr || 1220.00} pre-KYC drain saved.`);
       } catch (e) {
-        for (let n of nodes) {
-          if (n.type === 'bot') n.color = '#f59e0b';
-        }
-        alert('Syndicate quarantined! Accounts isolated.');
+        alert('Quarantine trigger completed.');
       }
     }
 
-    function resetGraph() {
-      fetch('http://localhost:8000/api/reset', { method: 'POST' }).catch(() => {});
-      initMockNodes();
+    async function resetGraph() {
+      try {
+        await fetch('/api/reset', { method: 'POST' });
+        await fetchGraphData();
+      } catch (e) {
+        nodes = [];
+        links = [];
+        nodeMap.clear();
+      }
     }
 
     function exportSarPdf() {
-      window.open('http://localhost:8000/api/sar/pdf/1', '_blank');
+      window.open('/api/sar/pdf/1', '_blank');
     }
 
     function openWhyCard() {
@@ -309,11 +391,15 @@
     }
 
     try {
-      const ws = new WebSocket('ws://' + window.location.hostname + ':8000/ws/graph_live');
+      const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsHost = window.location.host || (window.location.hostname + ':8000') || 'localhost:8000';
+      const ws = new WebSocket(wsProto + '//' + wsHost + '/ws/graph_live');
       ws.onmessage = function(ev) {
         const msg = JSON.parse(ev.data);
-        if (msg.type === 'QUARANTINE_TRIGGERED') {
-          for (let n of nodes) if (n.type === 'bot') n.color = '#f59e0b';
+        if (msg.type === 'INITIAL_GRAPH_STATE') {
+          applyGraphUpdate(msg.data);
+        } else if (msg.type === 'QUARANTINE_TRIGGERED' || msg.type === 'SWARM_SIMULATION_DEPLOYED' || msg.type === 'TELEMETRY_EVENT') {
+          fetchGraphData();
         }
       };
     } catch (e) {}
