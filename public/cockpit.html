@@ -62,6 +62,19 @@
       <div class="stat-pill">Nodes: <span id="stat-nodes" class="stat-val-green">0</span></div>
       <div class="stat-pill">Modularity Q: <span id="stat-q" class="stat-val-gold">0.0000</span></div>
       <div class="stat-pill">Null Permutation: <span id="stat-p" class="stat-val-red">Awaiting Ingress</span></div>
+      
+      <!-- Phase 2 Track 4: Interactive Sensitivity Threshold Slider -->
+      <div class="stat-pill" style="display:flex; align-items:center; gap:8px; background:rgba(30,27,75,0.7); border:1px solid #818cf8;">
+        <span style="font-size:0.7rem; font-weight:700; color:#a5b4fc;">θ Threshold:</span>
+        <input type="range" id="sensitivity-slider" min="0.50" max="0.90" step="0.02" value="0.70" style="width:75px; accent-color:#06b6d4; cursor:pointer;" oninput="updateSensitivity(this.value)">
+        <span id="slider-val" style="font-family:monospace; font-weight:700; color:#06b6d4; font-size:0.75rem;">0.70</span>
+      </div>
+
+      <!-- Phase 2 Track 6: Tactical Audio Alerts Toggle -->
+      <button id="btn-audio" onclick="toggleAudio()" class="stat-pill" style="background:rgba(15,23,42,0.8); border:1px solid #38bdf8; color:#38bdf8; cursor:pointer; font-weight:700;">
+        🔊 Sound: ON
+      </button>
+
       <div class="stat-pill">LAN Ingress: <span style="color:#06b6d4;">0.0.0.0:8000</span></div>
       <a href="/mathematical_deep_dive.html" target="_blank" style="text-decoration:none;">
         <div class="stat-pill" style="background:linear-gradient(135deg, rgba(6,182,212,0.25), rgba(16,185,129,0.25)); border:1px solid #06b6d4; color:#f1f5f9; cursor:pointer; font-weight:700;">
@@ -202,6 +215,102 @@
     let width, height;
     let nodes = [];
     let links = [];
+    let previousClusterCount = 0;
+
+    // Phase 2 Track 6: Synthesized Tactical Audio Alerts (Web Audio API)
+    let audioCtx = null;
+    let soundEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function toggleAudio() {
+      soundEnabled = !soundEnabled;
+      const btn = document.getElementById('btn-audio');
+      btn.textContent = soundEnabled ? '🔊 Sound: ON' : '🔇 Sound: OFF';
+      btn.style.color = soundEnabled ? '#38bdf8' : '#94a3b8';
+      btn.style.borderColor = soundEnabled ? '#38bdf8' : '#64748b';
+      if (soundEnabled) initAudio();
+    }
+
+    function playRadarSweep() {
+      if (!soundEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.12);
+    }
+
+    function playSwarmAlert() {
+      if (!soundEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+      [0, 0.18].forEach((delay) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(280, audioCtx.currentTime + delay);
+        osc.frequency.linearRampToValueAtTime(140, audioCtx.currentTime + delay + 0.15);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + 0.16);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + delay);
+        osc.stop(audioCtx.currentTime + delay + 0.16);
+      });
+    }
+
+    function playStepUpChime() {
+      if (!soundEnabled) return;
+      initAudio();
+      if (!audioCtx) return;
+      [523.25, 659.25, 783.99].forEach((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.08);
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime + idx * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.08 + 0.28);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + idx * 0.08);
+        osc.stop(audioCtx.currentTime + idx * 0.08 + 0.28);
+      });
+    }
+
+    // Phase 2 Track 4: Interactive Sensitivity Threshold Handler
+    let debounceTimer = null;
+    async function updateSensitivity(val) {
+      document.getElementById('slider-val').textContent = parseFloat(val).toFixed(2);
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(async () => {
+        try {
+          const resp = await fetch('/api/repartition?threshold=' + val, { method: 'POST' });
+          if (resp.ok) {
+            const data = await resp.json();
+            applyGraphUpdate(data);
+            playRadarSweep();
+          }
+        } catch (e) {
+          console.warn('Sensitivity update error:', e);
+        }
+      }, 120);
+    }
 
     function resize() {
       width = canvas.parentElement.clientWidth;
@@ -242,9 +351,13 @@
         for (let c of clusters) {
           totalDow += (c.dow_savings_inr || (c.size * 61.0));
         }
+        if (previousClusterCount === 0) {
+          playSwarmAlert();
+        }
       } else {
         document.getElementById('stat-p').textContent = backendNodes.length > 0 ? "Analyzing..." : "Awaiting Ingress";
       }
+      previousClusterCount = clusters.length;
       document.getElementById('dow-total').textContent = '₹' + totalDow.toFixed(2);
 
       if (backendNodes.length === 0) {
@@ -369,6 +482,8 @@
     // API triggers
     async function deploySimulation() {
       try {
+        initAudio();
+        playSwarmAlert();
         const resp = await fetch('/api/simulate_swarm', { method: 'POST' });
         const data = await resp.json();
         await fetchGraphData();
@@ -424,6 +539,11 @@
         const msg = JSON.parse(ev.data);
         if (msg.type === 'INITIAL_GRAPH_STATE') {
           applyGraphUpdate(msg.data);
+        } else if (msg.type === 'GRAPH_REPARTITIONED') {
+          fetchGraphData();
+        } else if (msg.type === 'STEP_UP_VERIFIED') {
+          playStepUpChime();
+          fetchGraphData();
         } else if (msg.type === 'QUARANTINE_TRIGGERED' || msg.type === 'SWARM_SIMULATION_DEPLOYED' || msg.type === 'TELEMETRY_EVENT') {
           fetchGraphData();
         }

@@ -184,6 +184,26 @@ def get_graph():
     """Returns active nodes, links, clusters, and Louvain modularity score Q."""
     return graph_engine.compute_clusters_and_modularity()
 
+@app.get("/api/repartition", response_model=GraphResponse)
+@app.post("/api/repartition", response_model=GraphResponse)
+async def repartition_graph(threshold: float = 0.70):
+    """
+    Phase 2 Dynamic Sensitivity Repartitioning:
+    Dynamically adjusts edge formation threshold theta (0.40 - 0.95),
+    recomputes Leiden community partitions across active sessions,
+    and broadcasts updated state over WebSockets to all connected cockpits.
+    """
+    graph_res = graph_engine.repartition_with_threshold(threshold)
+    await ws_manager.broadcast({
+        "type": "GRAPH_REPARTITIONED",
+        "threshold": threshold,
+        "global_modularity": graph_res.global_modularity,
+        "clusters_count": len(graph_res.clusters),
+        "total_active_sessions": graph_res.total_active_sessions,
+        "timestamp": time.time()
+    })
+    return graph_res
+
 @app.post("/api/quarantine", response_model=QuarantineResponse)
 async def quarantine_cluster(req: QuarantineRequest, db: Session = Depends(get_db)):
     """

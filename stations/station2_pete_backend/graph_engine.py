@@ -529,6 +529,35 @@ class ShadowGraphEngine:
             "prevented_bureau_cost": bureau_saved
         }
 
+    def repartition_with_threshold(self, new_threshold: float) -> GraphResponse:
+        """
+        Phase 2 Dynamic Sensitivity Repartitioning:
+        Adjusts edge threshold theta and immediately re-evaluates all pairwise edges
+        and Leiden community partitions across active sessions without needing client resubmissions.
+        """
+        clamped_thresh = max(0.40, min(0.95, float(new_threshold)))
+        self.edge_threshold = round(clamped_thresh, 4)
+
+        # Clear existing edges and re-evaluate across all active sessions
+        self.graph.clear_edges()
+        session_list = list(self.sessions.values())
+        n = len(session_list)
+        for i in range(n):
+            u = session_list[i]
+            for j in range(i + 1, n):
+                v = session_list[j]
+                comp_score, converged, delta_t, evidence_dict, cc_discount = self.calculate_pairwise_similarity(u, v)
+                if comp_score >= self.edge_threshold and len(converged) >= 3:
+                    self.graph.add_edge(
+                        u.account_id, v.account_id,
+                        weight=comp_score,
+                        converged=converged,
+                        delta_t=delta_t,
+                        evidence=evidence_dict,
+                        common_cause_discount=cc_discount
+                    )
+        return self.compute_clusters_and_modularity()
+
     def reset(self) -> None:
         """Clear graph state for fresh demonstration."""
         self.sessions.clear()

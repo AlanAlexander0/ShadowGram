@@ -527,6 +527,53 @@ class ShadowGraphEngine:
                 return True
         return False
 
+    def repartition_with_threshold(self, new_threshold: float) -> GraphResponse:
+        """
+        Phase 2 Dynamic Sensitivity Repartitioning:
+        Adjusts edge threshold theta and immediately re-evaluates all pairwise edges
+        and Leiden community partitions across active sessions without needing client resubmissions.
+        """
+        clamped_thresh = max(0.40, min(0.95, float(new_threshold)))
+        self.edge_threshold = round(clamped_thresh, 4)
+
+        # Clear existing edges and re-evaluate across all active sessions
+        self.graph.clear_edges()
+        session_list = list(self.sessions.values())
+        n = len(session_list)
+        for i in range(n):
+            u = session_list[i]
+            for j in range(i + 1, n):
+                v = session_list[j]
+                comp_score, converged, delta_t, evidence_dict, cc_discount = self.calculate_pairwise_similarity(u, v)
+                if comp_score >= self.edge_threshold and len(converged) >= 3:
+                    self.graph.add_edge(
+                        u.account_id, v.account_id,
+                        weight=comp_score,
+                        converged=converged,
+                        delta_t=delta_t,
+                        evidence=evidence_dict,
+                        common_cause_discount=cc_discount
+                    )
+        return self.compute_clusters_and_modularity()
+
+    def get_dow_stats(self) -> Dict[str, Any]:
+        """Returns live Denial-of-Wallet (DoW) economic defense metrics."""
+        quarantined_count = sum(1 for prof in self.sessions.values() if prof.status == "quarantined")
+        aadhaar_saved = quarantined_count * 3.0
+        pan_saved = quarantined_count * 2.0
+        liveness_saved = quarantined_count * 6.0
+        bureau_saved = quarantined_count * 50.0
+        total_saved = aadhaar_saved + pan_saved + liveness_saved + bureau_saved
+
+        return {
+            "total_bots_intercepted": quarantined_count,
+            "total_inr_saved": total_saved,
+            "prevented_aadhaar_cost": aadhaar_saved,
+            "prevented_pan_cost": pan_saved,
+            "prevented_liveness_cost": liveness_saved,
+            "prevented_bureau_cost": bureau_saved
+        }
+
     def reset(self) -> None:
         """Clear graph state for fresh demonstration."""
         self.sessions.clear()
