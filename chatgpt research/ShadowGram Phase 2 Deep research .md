@@ -454,7 +454,7 @@ For the hackathon:
 
 ### Do NOT
 
-run expensive persistent homology on the entire graph continuously.
+run expensive persistent homology on the entire graph contSinuously.
 
 ### DO
 
