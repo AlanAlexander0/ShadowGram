@@ -46,7 +46,7 @@ def compute_telemetry_hmac(session_id: str, timestamp: float, salt: str = SESSIO
     return hmac.new(salt.encode("utf-8"), sign_payload, hashlib.sha256).hexdigest()
 
 
-def load_personas(cache_path: Path, count: int = 20, live_ai: bool = False) -> List[Dict[str, Any]]:
+def load_personas(cache_path: Optional[Path] = None, count: int = 20, live_ai: bool = False, force_live_ai: bool = False) -> List[Dict[str, Any]]:
     """
     Loads personas with dual-mode support:
     1. Static / Pre-Generated JSON Mode (Default):
@@ -55,6 +55,10 @@ def load_personas(cache_path: Path, count: int = 20, live_ai: bool = False) -> L
        Connects to NVIDIA NIM (meta/llama-3.2-11b-vision-instruct) using NVIDIA_API_KEY from .env,
        dynamically synthesizes fresh synthetic Indian personas on the fly, and updates cache.
     """
+    if force_live_ai:
+        live_ai = True
+    if cache_path is None:
+        cache_path = Path(__file__).resolve().parent / "personas_cache.json"
     if live_ai:
         try:
             from generate_personas import get_nvidia_api_key, generate_personas_via_nvidia_nim
@@ -72,8 +76,20 @@ def load_personas(cache_path: Path, count: int = 20, live_ai: bool = False) -> L
                     sample = live_personas[0]
                     print(f"  -> AI Sample #1: {sample.get('full_name')} ({sample.get('occupation')} in {sample.get('city')}) - INR {sample.get('requested_loan_inr')}")
                     print(f"  -> AI Narrative: \"{sample.get('loan_purpose_narrative')}\"\n")
+                    if cache_path.exists():
+                        try:
+                            with open(cache_path, "r", encoding="utf-8") as f:
+                                existing = json.load(f)
+                            if isinstance(existing, list) and len(existing) > len(live_personas):
+                                to_save = live_personas + existing[len(live_personas):]
+                            else:
+                                to_save = live_personas
+                        except Exception:
+                            to_save = live_personas
+                    else:
+                        to_save = live_personas
                     with open(cache_path, "w", encoding="utf-8") as f:
-                        json.dump(live_personas, f, indent=2)
+                        json.dump(to_save, f, indent=2)
                     return live_personas[:count]
             except Exception as e:
                 print(f"[WARN] Live NVIDIA NIM generation failed: {e}. Falling back to cached personas.")
@@ -97,6 +113,10 @@ def load_personas(cache_path: Path, count: int = 20, live_ai: bool = False) -> L
     with open(cache_path, "w", encoding="utf-8") as f:
         json.dump(personas, f, indent=2)
     return personas
+
+
+# Alias for test runners and external scripts
+get_synthetic_personas = load_personas
 
 
 async def direct_telemetry_agent(

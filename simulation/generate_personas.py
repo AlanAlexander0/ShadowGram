@@ -156,7 +156,7 @@ def generate_personas_via_nvidia_nim(api_key: str, count: int = 20) -> List[Dict
                 headers=headers,
                 method="POST"
             )
-            with urllib.request.urlopen(req, timeout=25) as resp:
+            with urllib.request.urlopen(req, timeout=35) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
                 content = data["choices"][0]["message"]["content"].strip()
 
@@ -225,8 +225,21 @@ def main():
         print(f"[INFO] Using deterministic offline persona generator for {args.count} personas (Instant & Offline)...")
         personas = generate_offline_personas(args.count)
 
+    if cache_path.exists():
+        try:
+            with open(cache_path, "r", encoding="utf-8") as f:
+                existing = json.load(f)
+            if isinstance(existing, list) and len(existing) > len(personas):
+                to_save = personas + existing[len(personas):]
+            else:
+                to_save = personas
+        except Exception:
+            to_save = personas
+    else:
+        to_save = personas
+
     with open(cache_path, "w", encoding="utf-8") as f:
-        json.dump(personas, f, indent=2)
+        json.dump(to_save, f, indent=2)
 
     print(f"\n[SUCCESS] Saved {len(personas)} personas to {cache_path}")
     print(f"Sample Persona #1: {personas[0].get('full_name')} ({personas[0].get('occupation')} in {personas[0].get('city')}) - INR {personas[0].get('requested_loan_inr')}")
