@@ -69,7 +69,9 @@ def phase1_compile_all_python_files():
     for pf in sorted(py_files):
         rel_path = pf.relative_to(ROOT_DIR)
         try:
-            py_compile.compile(str(pf), doraise=True)
+            with open(pf, "r", encoding="utf-8") as f:
+                source = f.read()
+            compile(source, str(pf), "exec")
             record_result("Phase 1", f"Compile {rel_path}", True)
         except Exception as e:
             record_result("Phase 1", f"Compile {rel_path}", False, str(e))

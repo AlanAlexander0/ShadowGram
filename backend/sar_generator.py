@@ -6,9 +6,11 @@ Engine: ReportLab Platypus Vector Engine (Zero-Cloud Local Execution)
 """
 
 import os
+import io
 import time
 import hmac
 import hashlib
+from typing import Union, Dict, Any, Optional
 from datetime import datetime
 
 from reportlab.lib.pagesizes import A4
@@ -32,14 +34,38 @@ def generate_hmac_seal(cluster_id: str, secret_key: str = "SHADOWGRAM_STATION4_S
     return hmac.new(secret_key.encode("utf-8"), payload, hashlib.sha256).hexdigest()
 
 
-def generate_sar_pdf(cluster_id: str, cluster_data: dict, output_filename: str = "test_sar.pdf") -> str:
+def generate_sar_pdf(
+    cluster_arg: Any = None,
+    cluster_data: Optional[Dict[str, Any]] = None,
+    output_filename: Optional[str] = None
+) -> Union[bytes, str]:
     """
     Compiles a strict 2-Page Courtroom & Regulatory Ready Suspicious Activity Report (SAR).
+    Polymorphic: Accepts (cluster_data) -> returns bytes
+                Accepts (cluster_id, cluster_data, output_filename) -> writes file, returns filename str
     - Page 1: Metadata, Denial-of-Wallet (DoW) economics, and statutory reason codes.
     - Page 2: Maslov-Sneppen permutation test, RBI 2025 Directions clause, and HMAC seal.
     """
+    if isinstance(cluster_arg, dict):
+        if isinstance(cluster_data, str) and output_filename is None:
+            output_filename = cluster_data
+        cluster_data = cluster_arg
+        cluster_id = str(cluster_data.get("cluster_id", "cluster-2026-cl-0001"))
+    elif isinstance(cluster_arg, (str, int)):
+        cluster_id = str(cluster_arg)
+        if cluster_data is None:
+            cluster_data = {}
+    else:
+        cluster_id = "cluster-2026-cl-0001"
+        if cluster_data is None:
+            cluster_data = {}
+
+    if not cluster_id.startswith("cluster-") and not cluster_id.startswith("SG-"):
+        cluster_id = f"cluster-{cluster_id}"
+
+    target = output_filename if output_filename else io.BytesIO()
     doc = SimpleDocTemplate(
-        output_filename,
+        target,
         pagesize=A4,
         leftMargin=36,
         rightMargin=36,
@@ -124,9 +150,17 @@ def generate_sar_pdf(cluster_id: str, cluster_data: dict, output_filename: str =
     )
 
     story = []
-    nodes = cluster_data.get("nodes", ["node_01", "node_02"])
-    node_count = len(nodes)
+    nodes = cluster_data.get("nodes") or cluster_data.get("account_ids") or []
+    node_count = cluster_data.get("size") or len(nodes)
+    if node_count == 0:
+        node_count = 20
+    if not nodes:
+        nodes = [f"bot_session_{i+1:02d}" for i in range(node_count)]
     timestamp_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S IST")
+
+    mod_q = cluster_data.get("modularity_q", 0.7241)
+    mod_q_str = f"{mod_q:.4f}" if isinstance(mod_q, (int, float)) else str(mod_q)
+    dow_savings = cluster_data.get("dow_savings_inr", node_count * 61.0)
 
     # =========================================================================
     # PAGE 1: INCIDENT METADATA, DOW ECONOMICS & STATUTORY REASON CODES
@@ -155,7 +189,7 @@ def generate_sar_pdf(cluster_id: str, cluster_data: dict, output_filename: str =
             Paragraph("<b>Triage Stage:</b>", table_cell), Paragraph("Form Step 2 (Pre-KYC Onboarding)", table_cell)
         ],
         [
-            Paragraph("<b>Detection Algorithm:</b>", table_cell), Paragraph("Leiden Modularity (Q = 0.7241)", table_cell),
+            Paragraph("<b>Detection Algorithm:</b>", table_cell), Paragraph(f"Leiden Modularity (Q = {mod_q_str})", table_cell),
             Paragraph("<b>Flagged Accounts:</b>", table_cell), Paragraph(f"<b>{node_count} Concurrent Sessions</b>", table_cell)
         ],
         [
@@ -224,7 +258,7 @@ def generate_sar_pdf(cluster_id: str, cluster_data: dict, output_filename: str =
             Paragraph("<b>TOTAL AVOIDED ONBOARDING EXPOSURE</b>", body_bold),
             Paragraph("<b>₹61.00 - ₹118.50 per applicant</b>", body_bold),
             Paragraph("<b>₹6,20,000 / 10k bots</b>", body_bold),
-            Paragraph(f"<b>PROTECTED: ₹{node_count * 61:,.2f} SAVED</b>", body_bold)
+            Paragraph(f"<b>PROTECTED: ₹{dow_savings:,.2f} SAVED</b>", body_bold)
         ]
     ]
     dow_table = Table(dow_data, colWidths=[150, 130, 122, 120])
@@ -390,7 +424,9 @@ def generate_sar_pdf(cluster_id: str, cluster_data: dict, output_filename: str =
 
     # Build Document
     doc.build(story)
-    return output_filename
+    if output_filename:
+        return output_filename
+    return target.getvalue()
 
 
 # --- Standalone Verification / Demonstration ---

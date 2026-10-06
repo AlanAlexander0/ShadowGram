@@ -252,9 +252,9 @@ async def direct_telemetry_agent(
         except Exception:
             return None
 
-    # Asynchronously dispatch all packets without stalling the event loop
+    # Dispatch all packets and await delivery
     for pkt in [nav_packet, key_packet, pointer_packet, submit_packet]:
-        asyncio.create_task(asyncio.to_thread(_post_packet, pkt))
+        await asyncio.to_thread(_post_packet, pkt)
 
     return {
         "bot_id": bot_id,
