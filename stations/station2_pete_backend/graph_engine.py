@@ -491,8 +491,9 @@ class ShadowGraphEngine:
         """Sets status of all accounts in cluster to quarantined."""
         self.quarantined_clusters.add(cluster_id)
         count = 0
+        has_assigned_clusters = any(p.cluster_id is not None for p in self.sessions.values())
         for acc_id, prof in self.sessions.items():
-            if prof.cluster_id == cluster_id or cluster_id == 1:
+            if prof.cluster_id == cluster_id or (not has_assigned_clusters and cluster_id == 1):
                 prof.status = "quarantined"
                 prof.step_up_status = "pending"
                 count += 1

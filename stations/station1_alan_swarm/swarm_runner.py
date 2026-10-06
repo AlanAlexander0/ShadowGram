@@ -46,13 +46,64 @@ def compute_telemetry_hmac(session_id: str, timestamp: float, salt: str = SESSIO
     return hmac.new(salt.encode("utf-8"), sign_payload, hashlib.sha256).hexdigest()
 
 
-def load_personas(cache_path: Path, count: int = 20) -> List[Dict[str, Any]]:
-    """Loads personas from cache or auto-generates them if missing."""
+def load_personas(cache_path: Optional[Path] = None, count: int = 20, live_ai: bool = False, force_live_ai: bool = False) -> List[Dict[str, Any]]:
+    """
+    Loads personas with dual-mode support:
+    1. Static / Pre-Generated JSON Mode (Default):
+       Loads instantly from personas_cache.json for sub-second, 100% offline-safe hackathon execution.
+    2. Live NVIDIA NIM GenAI Mode (--live-ai):
+       Connects to NVIDIA NIM (meta/llama-3.2-11b-vision-instruct) using NVIDIA_API_KEY from .env,
+       dynamically synthesizes fresh synthetic Indian personas on the fly, and updates cache.
+    """
+    if force_live_ai:
+        live_ai = True
+    if cache_path is None:
+        cache_path = Path(__file__).resolve().parent / "personas_cache.json"
+    if live_ai:
+        try:
+            from generate_personas import get_nvidia_api_key, generate_personas_via_nvidia_nim
+        except ImportError:
+            from simulation.generate_personas import get_nvidia_api_key, generate_personas_via_nvidia_nim
+
+        api_key = get_nvidia_api_key()
+        if api_key:
+            print(f"\n[NVIDIA NIM AI] Live AI Mode enabled (--live-ai)!")
+            print(f"[NVIDIA NIM AI] Contacting NVIDIA NIM (meta/llama-3.2-11b-vision-instruct)...")
+            try:
+                live_personas = generate_personas_via_nvidia_nim(api_key, count=count)
+                if live_personas and len(live_personas) >= count:
+                    print(f"[NVIDIA NIM AI] Successfully generated {len(live_personas)} fresh AI synthetic identities!")
+                    sample = live_personas[0]
+                    print(f"  -> AI Sample #1: {sample.get('full_name')} ({sample.get('occupation')} in {sample.get('city')}) - INR {sample.get('requested_loan_inr')}")
+                    print(f"  -> AI Narrative: \"{sample.get('loan_purpose_narrative')}\"\n")
+                    if cache_path.exists():
+                        try:
+                            with open(cache_path, "r", encoding="utf-8") as f:
+                                existing = json.load(f)
+                            if isinstance(existing, list) and len(existing) > len(live_personas):
+                                to_save = live_personas + existing[len(live_personas):]
+                            else:
+                                to_save = live_personas
+                        except Exception:
+                            to_save = live_personas
+                    else:
+                        to_save = live_personas
+                    with open(cache_path, "w", encoding="utf-8") as f:
+                        json.dump(to_save, f, indent=2)
+                    return live_personas[:count]
+            except Exception as e:
+                print(f"[WARN] Live NVIDIA NIM generation failed: {e}. Falling back to cached personas.")
+        else:
+            print("[WARN] --live-ai requested, but NVIDIA_API_KEY was not found in .env. Falling back to cached personas.")
+
+    # Default Fast / Cached Mode
     if cache_path.exists():
         with open(cache_path, "r", encoding="utf-8") as f:
             personas = json.load(f)
             if len(personas) >= count:
+                print(f"[PERSONAS] Loaded {count} pre-generated synthetic personas from {cache_path.name} (Instant Mode).")
                 return personas[:count]
+
     # Fallback inline generation if file not found
     try:
         from generate_personas import generate_offline_personas
@@ -62,6 +113,10 @@ def load_personas(cache_path: Path, count: int = 20) -> List[Dict[str, Any]]:
     with open(cache_path, "w", encoding="utf-8") as f:
         json.dump(personas, f, indent=2)
     return personas
+
+
+# Alias for test runners and external scripts
+get_synthetic_personas = load_personas
 
 
 async def direct_telemetry_agent(
@@ -95,14 +150,23 @@ async def direct_telemetry_agent(
         }
     }
 
-    # 2. Keystroke Dynamics
+    # 2. Keystroke Dynamics & Biometric Digraphs
     t1 = t0 + 0.25
     if mode == "naive":
         key_flight = 15.0  # Robotic static timing
         key_dwell = 10.0
-    else:
+        digraph_flight = 12.0
+        is_digraph = False
+    elif mode == "dynamic-jitter":
+        key_flight = round(random.gauss(78.0, 15.0), 2)
+        key_dwell = round(random.gauss(68.0, 9.0), 2)
+        digraph_flight = round(random.gauss(70.0, 11.0), 2)
+        is_digraph = True
+    else:  # stealth
         key_flight = round(random.gauss(75.0, 12.0), 2)
         key_dwell = round(random.gauss(65.0, 8.0), 2)
+        digraph_flight = round(random.gauss(68.0, 10.0), 2)
+        is_digraph = True
 
     key_packet = {
         "session_id": session_id,
@@ -113,6 +177,8 @@ async def direct_telemetry_agent(
         "payload": {
             "key_flight_time_ms": key_flight,
             "key_dwell_time_ms": key_dwell,
+            "digraph_flight_time_ms": digraph_flight,
+            "is_common_digraph": is_digraph,
             "route_path": route_state
         }
     }
@@ -163,6 +229,7 @@ async def direct_telemetry_agent(
             "route_path": route_state,
             "key_flight_time_ms": key_flight,
             "key_dwell_time_ms": click_dwell,
+            "digraph_flight_time_ms": digraph_flight,
             "pointer_curvature_jerk": jerk_score,
             "narrative_text": persona.get("loan_purpose_narrative", "Urgent micro-loan needed for domestic repair expenditures."),
             "client_canvas_hash": "e4a8b71d9f02c6"  # Shared syndicate canvas hash
@@ -211,14 +278,28 @@ async def run_direct_swarm(
     print(f"[SWARM] Arrival synchronization window: {burst_window:.2f}s\n")
 
     burst_barrier = asyncio.Event()
-    # Distribute bot submission delays uniformly within the 1.4-second window
     tasks = []
-    for i, persona in enumerate(personas):
-        delay = (i / len(personas)) * burst_window + random.uniform(-0.04, 0.04)
-        delay = max(0.0, min(burst_window, delay))
-        tasks.append(
-            direct_telemetry_agent(i + 1, persona, telemetry_url, burst_barrier, delay, None, mode=mode)
-        )
+
+    if mode == "dynamic-jitter":
+        print(f"[SWARM JITTER] Generating Poisson-distributed inter-arrival intervals Delta_t ~ Exp(lambda)...")
+        mean_delta = burst_window / max(len(personas), 1)
+        lambd = 1.0 / max(mean_delta, 0.001)
+        current_offset = 0.0
+        for i, persona in enumerate(personas):
+            # Poisson point process inter-arrival delay
+            inter_arrival = random.expovariate(lambd)
+            current_offset += inter_arrival
+            tasks.append(
+                direct_telemetry_agent(i + 1, persona, telemetry_url, burst_barrier, current_offset, None, mode=mode)
+            )
+    else:
+        # Distribute bot submission delays uniformly within the burst window
+        for i, persona in enumerate(personas):
+            delay = (i / len(personas)) * burst_window + random.uniform(-0.04, 0.04)
+            delay = max(0.0, min(burst_window, delay))
+            tasks.append(
+                direct_telemetry_agent(i + 1, persona, telemetry_url, burst_barrier, delay, None, mode=mode)
+            )
 
     # Release all agents simultaneously
     start_time = time.time()
@@ -244,7 +325,8 @@ async def run_playwright_swarm(
     target_url: str,
     telemetry_url: str,
     headless: bool = True,
-    burst_window: float = 1.4
+    burst_window: float = 1.4,
+    mode: str = "stealth"
 ):
     """
     Runs full Playwright browser swarm.
@@ -300,7 +382,8 @@ async def run_playwright_swarm(
                 reason_input = await page.query_selector("#input-reason")
                 if reason_input and await reason_input.is_editable():
                     # Type loan justification with natural keystroke timing
-                    await page.type("#input-reason", persona["loan_purpose_narrative"][:35], delay=20)
+                    type_delay = 20 if mode != "naive" else 1
+                    await page.type("#input-reason", persona["loan_purpose_narrative"][:35], delay=type_delay)
 
                 # Wait for synchronized submission burst
                 await burst_barrier.wait()
@@ -327,9 +410,18 @@ async def run_playwright_swarm(
 
         # Build workers
         tasks = []
-        for i, persona in enumerate(personas):
-            delay = (i / len(personas)) * burst_window
-            tasks.append(bot_worker(i + 1, persona, delay))
+        if mode == "dynamic-jitter":
+            mean_delta = burst_window / max(len(personas), 1)
+            lambd = 1.0 / max(mean_delta, 0.001)
+            current_offset = 0.0
+            for i, persona in enumerate(personas):
+                inter_arrival = random.expovariate(lambd)
+                current_offset += inter_arrival
+                tasks.append(bot_worker(i + 1, persona, current_offset))
+        else:
+            for i, persona in enumerate(personas):
+                delay = (i / len(personas)) * burst_window
+                tasks.append(bot_worker(i + 1, persona, delay))
 
         # Trigger synchronized burst
         burst_barrier.set()
@@ -348,11 +440,24 @@ def main():
     parser.add_argument("--burst-window", type=float, default=1.4, help="Micro-temporal synchronization window in seconds (default: 1.4s)")
     parser.add_argument("--direct", action="store_true", help="Force direct synthetic telemetry dispatch without opening Chromium")
     parser.add_argument("--headed", action="store_true", help="Run browser in visible mode (default: headless)")
-    parser.add_argument("--mode", type=str, choices=["stealth", "naive"], default="stealth", help="Bot sophistication mode: stealth (bypasses Key 1, caught by Key 2) or naive (caught by Key 1)")
+    parser.add_argument(
+        "--mode",
+        type=str,
+        choices=["stealth", "naive", "dynamic-jitter", "dynamic_jitter"],
+        default="stealth",
+        help="Bot sophistication mode: stealth (bypasses Key 1, caught by Key 2), naive (caught by Key 1), or dynamic-jitter (Poisson inter-arrival jitter)"
+    )
+    parser.add_argument(
+        "--live-ai",
+        action="store_true",
+        help="Generate fresh synthetic personas live using NVIDIA NIM API (Llama-3.2) instead of cached JSON"
+    )
     args = parser.parse_args()
+    if args.mode == "dynamic_jitter":
+        args.mode = "dynamic-jitter"
 
     cache_file = Path(__file__).resolve().parent / "personas_cache.json"
-    personas = load_personas(cache_file, count=args.bots)
+    personas = load_personas(cache_file, count=args.bots, live_ai=args.live_ai)
 
     # Check Playwright availability
     playwright_available = False
@@ -371,7 +476,8 @@ def main():
                     target_url=args.target_url,
                     telemetry_url=args.telemetry_url,
                     headless=not args.headed,
-                    burst_window=args.burst_window
+                    burst_window=args.burst_window,
+                    mode=args.mode
                 )
             )
         except Exception as e:
