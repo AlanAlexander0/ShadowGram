@@ -46,13 +46,48 @@ def compute_telemetry_hmac(session_id: str, timestamp: float, salt: str = SESSIO
     return hmac.new(salt.encode("utf-8"), sign_payload, hashlib.sha256).hexdigest()
 
 
-def load_personas(cache_path: Path, count: int = 20) -> List[Dict[str, Any]]:
-    """Loads personas from cache or auto-generates them if missing."""
+def load_personas(cache_path: Path, count: int = 20, live_ai: bool = False) -> List[Dict[str, Any]]:
+    """
+    Loads personas with dual-mode support:
+    1. Static / Pre-Generated JSON Mode (Default):
+       Loads instantly from personas_cache.json for sub-second, 100% offline-safe hackathon execution.
+    2. Live NVIDIA NIM GenAI Mode (--live-ai):
+       Connects to NVIDIA NIM (meta/llama-3.2-11b-vision-instruct) using NVIDIA_API_KEY from .env,
+       dynamically synthesizes fresh synthetic Indian personas on the fly, and updates cache.
+    """
+    if live_ai:
+        try:
+            from generate_personas import get_nvidia_api_key, generate_personas_via_nvidia_nim
+        except ImportError:
+            from simulation.generate_personas import get_nvidia_api_key, generate_personas_via_nvidia_nim
+
+        api_key = get_nvidia_api_key()
+        if api_key:
+            print(f"\n[NVIDIA NIM AI] Live AI Mode enabled (--live-ai)!")
+            print(f"[NVIDIA NIM AI] Contacting NVIDIA NIM (meta/llama-3.2-11b-vision-instruct)...")
+            try:
+                live_personas = generate_personas_via_nvidia_nim(api_key, count=count)
+                if live_personas and len(live_personas) >= count:
+                    print(f"[NVIDIA NIM AI] Successfully generated {len(live_personas)} fresh AI synthetic identities!")
+                    sample = live_personas[0]
+                    print(f"  -> AI Sample #1: {sample.get('full_name')} ({sample.get('occupation')} in {sample.get('city')}) - INR {sample.get('requested_loan_inr')}")
+                    print(f"  -> AI Narrative: \"{sample.get('loan_purpose_narrative')}\"\n")
+                    with open(cache_path, "w", encoding="utf-8") as f:
+                        json.dump(live_personas, f, indent=2)
+                    return live_personas[:count]
+            except Exception as e:
+                print(f"[WARN] Live NVIDIA NIM generation failed: {e}. Falling back to cached personas.")
+        else:
+            print("[WARN] --live-ai requested, but NVIDIA_API_KEY was not found in .env. Falling back to cached personas.")
+
+    # Default Fast / Cached Mode
     if cache_path.exists():
         with open(cache_path, "r", encoding="utf-8") as f:
             personas = json.load(f)
             if len(personas) >= count:
+                print(f"[PERSONAS] Loaded {count} pre-generated synthetic personas from {cache_path.name} (Instant Mode).")
                 return personas[:count]
+
     # Fallback inline generation if file not found
     try:
         from generate_personas import generate_offline_personas
@@ -392,12 +427,17 @@ def main():
         default="stealth",
         help="Bot sophistication mode: stealth (bypasses Key 1, caught by Key 2), naive (caught by Key 1), or dynamic-jitter (Poisson inter-arrival jitter)"
     )
+    parser.add_argument(
+        "--live-ai",
+        action="store_true",
+        help="Generate fresh synthetic personas live using NVIDIA NIM API (Llama-3.2) instead of cached JSON"
+    )
     args = parser.parse_args()
     if args.mode == "dynamic_jitter":
         args.mode = "dynamic-jitter"
 
     cache_file = Path(__file__).resolve().parent / "personas_cache.json"
-    personas = load_personas(cache_file, count=args.bots)
+    personas = load_personas(cache_file, count=args.bots, live_ai=args.live_ai)
 
     # Check Playwright availability
     playwright_available = False
