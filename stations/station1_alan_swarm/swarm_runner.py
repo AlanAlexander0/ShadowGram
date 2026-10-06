@@ -95,14 +95,23 @@ async def direct_telemetry_agent(
         }
     }
 
-    # 2. Keystroke Dynamics
+    # 2. Keystroke Dynamics & Biometric Digraphs
     t1 = t0 + 0.25
     if mode == "naive":
         key_flight = 15.0  # Robotic static timing
         key_dwell = 10.0
-    else:
+        digraph_flight = 12.0
+        is_digraph = False
+    elif mode == "dynamic-jitter":
+        key_flight = round(random.gauss(78.0, 15.0), 2)
+        key_dwell = round(random.gauss(68.0, 9.0), 2)
+        digraph_flight = round(random.gauss(70.0, 11.0), 2)
+        is_digraph = True
+    else:  # stealth
         key_flight = round(random.gauss(75.0, 12.0), 2)
         key_dwell = round(random.gauss(65.0, 8.0), 2)
+        digraph_flight = round(random.gauss(68.0, 10.0), 2)
+        is_digraph = True
 
     key_packet = {
         "session_id": session_id,
@@ -113,6 +122,8 @@ async def direct_telemetry_agent(
         "payload": {
             "key_flight_time_ms": key_flight,
             "key_dwell_time_ms": key_dwell,
+            "digraph_flight_time_ms": digraph_flight,
+            "is_common_digraph": is_digraph,
             "route_path": route_state
         }
     }
@@ -163,6 +174,7 @@ async def direct_telemetry_agent(
             "route_path": route_state,
             "key_flight_time_ms": key_flight,
             "key_dwell_time_ms": click_dwell,
+            "digraph_flight_time_ms": digraph_flight,
             "pointer_curvature_jerk": jerk_score,
             "narrative_text": persona.get("loan_purpose_narrative", "Urgent micro-loan needed for domestic repair expenditures."),
             "client_canvas_hash": "e4a8b71d9f02c6"  # Shared syndicate canvas hash
@@ -211,14 +223,28 @@ async def run_direct_swarm(
     print(f"[SWARM] Arrival synchronization window: {burst_window:.2f}s\n")
 
     burst_barrier = asyncio.Event()
-    # Distribute bot submission delays uniformly within the 1.4-second window
     tasks = []
-    for i, persona in enumerate(personas):
-        delay = (i / len(personas)) * burst_window + random.uniform(-0.04, 0.04)
-        delay = max(0.0, min(burst_window, delay))
-        tasks.append(
-            direct_telemetry_agent(i + 1, persona, telemetry_url, burst_barrier, delay, None, mode=mode)
-        )
+
+    if mode == "dynamic-jitter":
+        print(f"[SWARM JITTER] Generating Poisson-distributed inter-arrival intervals Delta_t ~ Exp(lambda)...")
+        mean_delta = burst_window / max(len(personas), 1)
+        lambd = 1.0 / max(mean_delta, 0.001)
+        current_offset = 0.0
+        for i, persona in enumerate(personas):
+            # Poisson point process inter-arrival delay
+            inter_arrival = random.expovariate(lambd)
+            current_offset += inter_arrival
+            tasks.append(
+                direct_telemetry_agent(i + 1, persona, telemetry_url, burst_barrier, current_offset, None, mode=mode)
+            )
+    else:
+        # Distribute bot submission delays uniformly within the burst window
+        for i, persona in enumerate(personas):
+            delay = (i / len(personas)) * burst_window + random.uniform(-0.04, 0.04)
+            delay = max(0.0, min(burst_window, delay))
+            tasks.append(
+                direct_telemetry_agent(i + 1, persona, telemetry_url, burst_barrier, delay, None, mode=mode)
+            )
 
     # Release all agents simultaneously
     start_time = time.time()
@@ -244,7 +270,8 @@ async def run_playwright_swarm(
     target_url: str,
     telemetry_url: str,
     headless: bool = True,
-    burst_window: float = 1.4
+    burst_window: float = 1.4,
+    mode: str = "stealth"
 ):
     """
     Runs full Playwright browser swarm.
@@ -300,7 +327,8 @@ async def run_playwright_swarm(
                 reason_input = await page.query_selector("#input-reason")
                 if reason_input and await reason_input.is_editable():
                     # Type loan justification with natural keystroke timing
-                    await page.type("#input-reason", persona["loan_purpose_narrative"][:35], delay=20)
+                    type_delay = 20 if mode != "naive" else 1
+                    await page.type("#input-reason", persona["loan_purpose_narrative"][:35], delay=type_delay)
 
                 # Wait for synchronized submission burst
                 await burst_barrier.wait()
@@ -327,9 +355,18 @@ async def run_playwright_swarm(
 
         # Build workers
         tasks = []
-        for i, persona in enumerate(personas):
-            delay = (i / len(personas)) * burst_window
-            tasks.append(bot_worker(i + 1, persona, delay))
+        if mode == "dynamic-jitter":
+            mean_delta = burst_window / max(len(personas), 1)
+            lambd = 1.0 / max(mean_delta, 0.001)
+            current_offset = 0.0
+            for i, persona in enumerate(personas):
+                inter_arrival = random.expovariate(lambd)
+                current_offset += inter_arrival
+                tasks.append(bot_worker(i + 1, persona, current_offset))
+        else:
+            for i, persona in enumerate(personas):
+                delay = (i / len(personas)) * burst_window
+                tasks.append(bot_worker(i + 1, persona, delay))
 
         # Trigger synchronized burst
         burst_barrier.set()
@@ -348,8 +385,16 @@ def main():
     parser.add_argument("--burst-window", type=float, default=1.4, help="Micro-temporal synchronization window in seconds (default: 1.4s)")
     parser.add_argument("--direct", action="store_true", help="Force direct synthetic telemetry dispatch without opening Chromium")
     parser.add_argument("--headed", action="store_true", help="Run browser in visible mode (default: headless)")
-    parser.add_argument("--mode", type=str, choices=["stealth", "naive"], default="stealth", help="Bot sophistication mode: stealth (bypasses Key 1, caught by Key 2) or naive (caught by Key 1)")
+    parser.add_argument(
+        "--mode",
+        type=str,
+        choices=["stealth", "naive", "dynamic-jitter", "dynamic_jitter"],
+        default="stealth",
+        help="Bot sophistication mode: stealth (bypasses Key 1, caught by Key 2), naive (caught by Key 1), or dynamic-jitter (Poisson inter-arrival jitter)"
+    )
     args = parser.parse_args()
+    if args.mode == "dynamic_jitter":
+        args.mode = "dynamic-jitter"
 
     cache_file = Path(__file__).resolve().parent / "personas_cache.json"
     personas = load_personas(cache_file, count=args.bots)
@@ -371,7 +416,8 @@ def main():
                     target_url=args.target_url,
                     telemetry_url=args.telemetry_url,
                     headless=not args.headed,
-                    burst_window=args.burst_window
+                    burst_window=args.burst_window,
+                    mode=args.mode
                 )
             )
         except Exception as e:

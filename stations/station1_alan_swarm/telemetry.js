@@ -132,6 +132,14 @@
   let pointerMovesBeforeClick = 0;
   let currentRoute = window.location.pathname;
 
+  // Biometric Digraph Tracking (Zero-PII: No character logging, strictly interval deltas)
+  // Common English/Latin financial application digraphs: th, he, in, er, an, re, on, at, en, nd, ti, es, or, te, of, ed, is, it, al, ar
+  const COMMON_DIGRAPHS = new Set([
+    'th', 'he', 'in', 'er', 'an', 're', 'on', 'at', 'en', 'nd', 'ti', 'es', 'or', 'te', 'of', 'ed', 'is', 'it', 'al', 'ar'
+  ]);
+  let lastKeyChar = null;
+  let lastKeyDownTime = null;
+
   function pushTelemetryEvent(eventType, payload) {
     const timestamp = Date.now() / 1000.0;
     const signPayload = sessionId + ':' + timestamp.toFixed(3);
@@ -150,7 +158,7 @@
 
   // --- Event Listeners ---
 
-  // 1. Keystroke Dynamics (Zero-PII: No key identifiers, only delta-t)
+  // 1. Keystroke Dynamics & Biometric Digraphs (Zero-PII: No key identifiers transmitted, only delta-t)
   window.addEventListener('keydown', function (e) {
     const now = performance.now();
     let flightTime = null;
@@ -162,8 +170,25 @@
       activeKeyDownTimes.set(e.code || e.keyCode, now);
     }
 
+    // Biometric Digraph Flight Time (Zero-PII: Characters are only evaluated locally, never stored or sent)
+    let digraphFlightTime = null;
+    let isCommonDigraph = false;
+    const currentChar = (e.key && e.key.length === 1) ? e.key.toLowerCase() : null;
+
+    if (lastKeyChar && currentChar && lastKeyDownTime !== null) {
+      const pair = lastKeyChar + currentChar;
+      if (COMMON_DIGRAPHS.has(pair)) {
+        isCommonDigraph = true;
+        digraphFlightTime = Math.max(0, roundToDecimals(now - lastKeyDownTime, 2));
+      }
+    }
+    lastKeyChar = currentChar;
+    lastKeyDownTime = now;
+
     pushTelemetryEvent('keydown', {
       key_flight_time_ms: flightTime,
+      digraph_flight_time_ms: digraphFlightTime,
+      is_common_digraph: isCommonDigraph,
       route_path: currentRoute
     });
   }, { passive: true });

@@ -6,7 +6,7 @@ Zero external dependencies (pure Python).
 
 import math
 import random
-from typing import List, Tuple
+from typing import List, Tuple, Any
 
 
 def generate_human_trajectory(

@@ -119,6 +119,13 @@
   let pointerMovesBeforeClick = 0;
   let currentRoute = window.location.pathname;
 
+  // Biometric Digraph Tracking (Zero-PII: No character logging, strictly interval deltas)
+  const COMMON_DIGRAPHS = new Set([
+    'th', 'he', 'in', 'er', 'an', 're', 'on', 'at', 'en', 'nd', 'ti', 'es', 'or', 'te', 'of', 'ed', 'is', 'it', 'al', 'ar'
+  ]);
+  let lastKeyChar = null;
+  let lastKeyDownTime = null;
+
   function pushTelemetryEvent(eventType, payload) {
     const timestamp = Date.now() / 1000.0;
     const signPayload = sessionId + ':' + timestamp.toFixed(3);
@@ -145,8 +152,25 @@
       activeKeyDownTimes.set(e.code || e.keyCode, now);
     }
 
+    // Biometric Digraph Flight Time (Zero-PII)
+    let digraphFlightTime = null;
+    let isCommonDigraph = false;
+    const currentChar = (e.key && e.key.length === 1) ? e.key.toLowerCase() : null;
+
+    if (lastKeyChar && currentChar && lastKeyDownTime !== null) {
+      const pair = lastKeyChar + currentChar;
+      if (COMMON_DIGRAPHS.has(pair)) {
+        isCommonDigraph = true;
+        digraphFlightTime = Math.max(0, roundToDecimals(now - lastKeyDownTime, 2));
+      }
+    }
+    lastKeyChar = currentChar;
+    lastKeyDownTime = now;
+
     pushTelemetryEvent('keydown', {
       key_flight_time_ms: flightTime,
+      digraph_flight_time_ms: digraphFlightTime,
+      is_common_digraph: isCommonDigraph,
       route_path: currentRoute
     });
   }, { passive: true });
