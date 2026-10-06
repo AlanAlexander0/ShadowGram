@@ -1,26 +1,17 @@
 /**
  * ShadowGram Client-Side Telemetry SDK (telemetry.js)
- * Document Code: SG-PROTO-00 / Task 3.1
- * Assignee: Alan E Alexander (Role 3: Red-Team Swarm Runner & Client Telemetry Lead)
- * 
- * Strict Compliance:
- * 1. ZERO-PII: Never records key names, characters, or text inputs. Only time deltas (FT, DT).
- * 2. 50ms Throttling on cursor movements to guarantee zero UI lag during live judge testing.
- * 3. Self-contained pure JS HMAC-SHA256 for cryptographic telemetry signing (works on non-HTTPS LAN).
- * 4. Buffers and flushes to Laptop 2 (POST /telemetry) every 1.0s or via navigator.sendBeacon.
+ * Station 3 (AthenaPay App) behavioral telemetry library
  */
 
 (function (window, document) {
   'use strict';
 
-  // --- Configuration ---
   const config = window.__SHADOWGRAM_CONFIG__ || {};
   const BACKEND_ENDPOINT = config.endpoint || 'http://localhost:8000/telemetry';
   const FLUSH_INTERVAL_MS = config.flushIntervalMs || 1000;
   const POINTER_THROTTLE_MS = 50;
   const SESSION_SALT = config.sessionSalt || 'shadowgram-hackathena-2026-salt';
 
-  // --- Session State ---
   function generateUUID() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
       const r = (Math.random() * 16) | 0;
@@ -47,7 +38,6 @@
     return a;
   })();
 
-  // --- Pure JS HMAC-SHA256 (Zero Dependency, Works on HTTP LAN & HTTPS) ---
   function sha256(ascii) {
     function rightRotate(value, amount) {
       return (value >>> amount) | (value << (32 - amount));
@@ -55,7 +45,6 @@
     const mathPow = Math.pow;
     const maxWord = mathPow(2, 32);
     let i, j;
-    const result = '';
     const words = [];
     const asciiBitLength = ascii.length * 8;
     let hash = sha256.h = sha256.h || [];
@@ -121,7 +110,6 @@
     return sha256(oKeyPad + hexToBinary(innerHash));
   }
 
-  // --- Telemetry Buffering ---
   let eventQueue = [];
   let lastKeyUpTime = null;
   const activeKeyDownTimes = new Map();
@@ -147,16 +135,12 @@
     eventQueue.push(packet);
   }
 
-  // --- Event Listeners ---
-
-  // 1. Keystroke Dynamics (Zero-PII: No key identifiers, only delta-t)
   window.addEventListener('keydown', function (e) {
     const now = performance.now();
     let flightTime = null;
     if (lastKeyUpTime !== null) {
       flightTime = Math.max(0, roundToDecimals(now - lastKeyUpTime, 2));
     }
-    // Track start time for dwell time calculation
     if (!activeKeyDownTimes.has(e.code || e.keyCode)) {
       activeKeyDownTimes.set(e.code || e.keyCode, now);
     }
@@ -183,7 +167,6 @@
     });
   }, { passive: true });
 
-  // 2. Pointer Movement & Neuromotor Kinetics (Throttled to 50ms)
   window.addEventListener('pointermove', function (e) {
     pointerMovesBeforeClick++;
     const now = performance.now();
@@ -224,7 +207,7 @@
       dwellDuration = Math.max(1, roundToDecimals(now - pointerDownTime, 2));
     }
     const preClickMoves = pointerMovesBeforeClick;
-    pointerMovesBeforeClick = 0; // Reset for next interaction
+    pointerMovesBeforeClick = 0;
 
     pushTelemetryEvent('pointerdown', {
       click_dwell_duration_ms: dwellDuration,
@@ -233,55 +216,18 @@
     });
   }, { passive: true });
 
-  // 3. Navigation Route Tracking
-  function recordRouteChange(newPath) {
-    if (newPath !== currentRoute) {
-      const prev = currentRoute;
-      currentRoute = newPath;
-      pushTelemetryEvent('route_change', {
-        route_path: prev + ' -> ' + newPath
-      });
-    }
-  }
-
-  window.addEventListener('popstate', function () {
-    recordRouteChange(window.location.pathname);
-  });
-
-  // Intercept history.pushState and replaceState
-  const origPushState = history.pushState;
-  if (origPushState) {
-    history.pushState = function () {
-      origPushState.apply(this, arguments);
-      recordRouteChange(window.location.pathname);
-    };
-  }
-
-  // 4. Honey-DOM Tripwire Detection
-  document.addEventListener('click', function (e) {
-    const target = e.target;
-    if (target && (target.id === 'honey-dom-profile-sync' || target.getAttribute('data-honey') === 'tripwire')) {
-      pushTelemetryEvent('honey_dom_trip', {
-        tripwire_id: target.id || '#data-honey-tripwire',
-        route_path: currentRoute
-      });
-    }
-  }, true);
-
-  // --- Math Utilities ---
   function roundToDecimals(val, decimals) {
     const factor = Math.pow(10, decimals);
     return Math.round(val * factor) / factor;
   }
 
   function estimateCurvatureJerk(coords) {
-    if (coords.length < 4) return 0.05; // Default organic baseline
+    if (coords.length < 4) return 0.05;
     let totalJerk = 0;
     let samples = 0;
     for (let i = 3; i < coords.length; i++) {
       const dt = coords[i][2] - coords[i - 1][2];
       if (dt > 0.001) {
-        // d3x/dt3 derivative approximation
         const dx1 = coords[i][0] - coords[i - 1][0];
         const dx0 = coords[i - 1][0] - coords[i - 2][0];
         const d2x = (dx1 - dx0) / dt;
@@ -292,13 +238,11 @@
     return samples > 0 ? roundToDecimals(totalJerk / (samples * 1000), 4) : 0.04;
   }
 
-  // --- Periodic Telemetry Flushing ---
   function flushQueue() {
     if (eventQueue.length === 0) return;
     const batch = eventQueue.slice();
     eventQueue = [];
 
-    // Send each packet or batch to Laptop 2
     for (let i = 0; i < batch.length; i++) {
       const packet = batch[i];
       const payloadStr = JSON.stringify(packet);
@@ -313,7 +257,6 @@
           body: payloadStr,
           keepalive: true
         }).catch(function (err) {
-          // Silent local failover: does not crash the client UI
           console.debug('[ShadowGram Telemetry] Ingress offline:', err.message);
         });
       }
@@ -323,7 +266,6 @@
   setInterval(flushQueue, FLUSH_INTERVAL_MS);
   window.addEventListener('beforeunload', flushQueue);
 
-  // Expose minimal API for manual trigger or testing
   window.ShadowGramTelemetry = {
     sessionId: sessionId,
     accountId: accountId,

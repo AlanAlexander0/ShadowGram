@@ -2,7 +2,11 @@ import os
 import asyncio
 import requests
 from typing import Dict, Any
-from backend.fallback_sar import deterministic_sar_narrative
+
+try:
+    from fallback_sar import deterministic_sar_narrative
+except ImportError:
+    from backend.fallback_sar import deterministic_sar_narrative
 
 NVIDIA_NIM_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
 NVIDIA_MODEL = "meta/llama-3.3-70b-instruct"

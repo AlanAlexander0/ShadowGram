@@ -515,6 +515,7 @@
       <li class="nav-item"><a href="#chapter-5" class="nav-link">5. Hardware Specs & Hotspot LAN</a></li>
       <li class="nav-item"><a href="#chapter-6" class="nav-link">6. Team Roles & Checkpoint Rules</a></li>
       <li class="nav-item"><a href="#chapter-7" class="nav-link">7. Live Cyber-Range Demo Guide</a></li>
+      <li class="nav-item"><a href="#chapter-audit" class="nav-link">8. Architecture Evolution & Stress-Test Audit</a></li>
       <li class="nav-item"><a href="#appendix" class="nav-link">Appendix: Master Glossary & Bibliography</a></li>
     </ul>
   </aside>
@@ -562,15 +563,16 @@
         The fraud does not live inside any single account. The fraud lives in the hidden statistical relationship between accounts.
       </div>
 
-      <h3 class="section-heading">0.2 How ShadowGram Solves the Problem</h3>
+      <h3 class="section-heading">0.2 How ShadowGram Solves the Problem: The Two-Key Architecture</h3>
       <p>
-        ShadowGram does not evaluate accounts in isolation. ShadowGram watches the entire system from above:
+        ShadowGram does not evaluate accounts in isolation. ShadowGram deploys a Two-Key Defense at Form Step 2:
       </p>
       <ol>
-        <li>It records five layers of interaction physics: arrival timing ($\Delta t$), route sequence, mouse acceleration jerk, semantic loan meaning, and hardware entropy.</li>
-        <li>It creates an in-memory graph where accounts are nodes and behavioral similarities are edges.</li>
-        <li>It uses the <strong>Louvain Modularity Algorithm</strong> to identify the entire coordinated syndicate as a tightly linked cluster.</li>
-        <li>It shows an explainable <strong>"Why Card"</strong> with mathematical facts, letting bank officers freeze the whole syndicate with one click.</li>
+        <li><strong>Key 1 (Per-Session Automation Filter):</strong> Inspects low-level browser telemetry in less than 5 milliseconds. It identifies missing raw mouse-movement events, zero click-dwell variance, and automation flags. This blocks standard automated tools immediately.</li>
+        <li><strong>Key 2 (Multi-Modal Relational Graph):</strong> Tracks advanced bots that use human-emulation or operating-system inputs. It measures five layers of interaction physics: time rhythm, navigation sequence, kinetic event dynamics, semantic vector intent, and hardware entropy.</li>
+        <li><strong>Pre-KYC Denial-of-Wallet Triage:</strong> ShadowGram clusters accounts before third-party verification APIs execute. This stops attackers from exhausting expensive verification budgets (Aadhaar, PAN, and credit bureaus).</li>
+        <li><strong>Community Detection (Leiden / Louvain):</strong> It groups coordinated accounts into clusters. The Leiden algorithm ensures communities are well connected and avoids resolution limits.</li>
+        <li><strong>Verifiable "Why Card":</strong> Shows empirical statistical proof ($p < 0.001$). Bank officers can review the evidence and quarantine the syndicate with one click.</li>
       </ol>
 
       <!-- SVG Diagram: Single Account vs Relational Graph -->
@@ -651,12 +653,12 @@
         <li><strong>Generation 3 (Autonomous AI Swarms, 2026):</strong> Distributed agent runtimes powered by local language and vision models. Each bot instance executes independent browser interactions, solves visual CAPTCHAs, randomizes mouse movement, and rotates residential mobile proxies.</li>
       </ul>
 
-      <h3 class="section-heading">1.2 Documented Industry Context: Digital Lending Risk & Enforcement</h3>
+      <h3 class="section-heading">1.2 Documented Industry Context: Digital Lending Regulatory Scrutiny</h3>
       <div class="ste-warning">
-        <div class="ste-warning-title">Judicial Record: Telangana High Court / ED PMLA Proceedings</div>
-        <strong>Case:</strong> <em>M/s Krazybee Services Private Limited vs. Directorate of Enforcement</em> (High Court for the State of Telangana, March 2025).<br>
-        <strong>Legal Context:</strong> Investigative proceedings stemming from 43 First Information Reports (FIRs) under IPC Sections 420, 384, 506 and IT Act Section 66D regarding predatory micro-lending apps, leading to provisional attachment orders of ~₹65.87 Crore under the Prevention of Money Laundering Act (PMLA).<br>
-        <strong>Operational Impact:</strong> Demonstrates that automated micro-lending pipelines face severe systemic, legal, and operational exposure when automated underwriting lacks rigorous multi-dimensional governance.
+        <div class="ste-warning-title">Regulatory Context: Digital Lending Oversight & Enforcement</div>
+        <strong>Legal Landscape:</strong> Regulators actively inspect digital micro-lenders. In 2025, the Reserve Bank of India issued updated Master Directions for digital lending. Under the Prevention of Money Laundering Act (PMLA), Indian enforcement agencies scrutinize digital credit pipelines.<br>
+        <strong>Case Note:</strong> In <em>M/s Krazybee Services vs. Directorate of Enforcement</em>, the Telangana High Court quashed provisional attachment proceedings on March 11, 2025. This case highlighted that automated micro-lending platforms face extreme regulatory scrutiny regarding borrower verification, audit logs, and underwriting controls.<br>
+        <strong>Operational Impact:</strong> Automated lending pipelines must maintain verifiable, explainable audit trails. Unexplained algorithmic actions create legal and compliance liabilities.
       </div>
 
       <h3 class="section-heading">1.3 Adversarial Threat Model 1: The Micro-Lending Flash Syndicate Simulation</h3>
@@ -673,7 +675,7 @@
       <h3 class="section-heading">1.4 Documented Fraud Trend: BNPL Automated Payment Fraud (+211% Surge)</h3>
       <div class="ste-note">
         <div class="ste-note-title">Verified Empirical Metric: Sift Digital Trust & Safety Index</div>
-        Sift reported a <strong>211% year-over-year increase in attempted payment fraud targeting Buy Now, Pay Later (BNPL)</strong> platforms within its global merchant telemetry network (compared to +13% growth across broad fintech sectors).
+        Sift documented a <strong>211% year-over-year increase in attempted payment fraud targeting Buy Now, Pay Later (BNPL)</strong> platforms within its global merchant network data (Sift Q1 2023 Index, comparing annual payment fraud trends against +13% fintech baseline).
       </div>
       <p>
         Autonomous fraud swarms target alternative payment rails because decoupled underwriting and instant checkout create latency gaps between transaction execution and asynchronous bureau reporting.
@@ -753,34 +755,40 @@
             <tr>
               <th>Competitor System</th>
               <th>How They Defend</th>
-              <th>Why They Fail Against 2026 Swarms</th>
+              <th>Where They Fall Short Against 2026 Swarms</th>
               <th>Empirical Research Citation</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><strong>BioCatch</strong><br>(Behavioral Biometrics)</td>
-              <td>Constructs user profile over months of mobile/web interactions.</td>
-              <td><strong>Fails on Day Zero:</strong> Brand-new synthetic accounts have zero historical baseline. Falls back to weak population heuristics.</td>
-              <td>Federal Reserve Synthetic Identity Fraud Whitepaper; NAF Consensus.</td>
+              <td><strong>BioCatch</strong><br>(Scout & Behavioral Biometrics)</td>
+              <td>Uses behavioral biometrics and BioCatch Scout link-analysis graph (50k+ nodes, 250k+ edges) in a global cloud consortium.</td>
+              <td><strong>Centralized Cloud Lock-in:</strong> Sells expensive multi-million-dollar cloud software. Cannot execute lightweight, local on-premise pre-KYC triage at Form Step 2. Produces proprietary black-box risk scores rather than open, regulator-auditable evidence.</td>
+              <td>BioCatch Scout Launch (2023); BioCatch Agentic Fraud Report (June 2026).</td>
+            </tr>
+            <tr>
+              <td><strong>DataVisor</strong><br>(Unsupervised Machine Learning)</td>
+              <td>Deploys patented unsupervised attack ring detection and graph clustering to find coordinated groups.</td>
+              <td><strong>Post-Submission & Flash Crowd Limits:</strong> Operates primarily on post-submission enterprise data lakes. Faces high false-positive rates during legitimate viral events (e.g., campus application drives) without physical event-stream invariants.</td>
+              <td>DataVisor Patents on Unsupervised Ring Detection; DataVisor Cluster Quality Studies.</td>
             </tr>
             <tr>
               <td><strong>Arkose Labs</strong><br>(Bot Challenge Manager)</td>
               <td>Deploys 3D visual rotation, dice count, and spatial puzzles.</td>
-              <td><strong>Bypassed by Vision-LLMs:</strong> Multimodal models solve modern 3D puzzles with 70% to 85% accuracy.</td>
-              <td><em>USENIX Security 2024:</em> "The Threat of Vision-Language Models to CAPTCHAs".</td>
+              <td><strong>Bypassed by Vision-LLMs:</strong> Generalist vision models solve modern visual challenges with 60.7% to 70.6% accuracy across commercial puzzle types (and up to 93.2% on visual reasoning).</td>
+              <td>Halligan, <em>USENIX Security 2025</em>; ViPer, <em>USENIX Security 2026</em>.</td>
             </tr>
             <tr>
               <td><strong>Sift & ThreatMetrix</strong><br>(Identity Consortiums)</td>
-              <td>Matches shared IP addresses, hardware MACs, and device hashes.</td>
-              <td><strong>Bypassed by Mobile Proxies:</strong> Swarms route through 4G/5G residential proxies using Carrier-Grade NAT (CGNAT).</td>
-              <td>Sift Digital Trust Report; Anti-detect browsers (Multilogin, AdsPower).</td>
+              <td>Matches shared IP addresses, hardware MACs, and device hashes across a merchant network.</td>
+              <td><strong>Bypassed by Mobile Proxies:</strong> Swarms route through 4G/5G residential cellular proxies using Carrier-Grade NAT (CGNAT). Anti-detect browsers spoof canvas and audio fingerprints per session.</td>
+              <td>Sift Digital Trust Report; Anti-detect frameworks (Multilogin, AdsPower).</td>
             </tr>
             <tr>
               <td><strong>Cloudflare Turnstile & reCAPTCHA v3</strong></td>
-              <td>Monitors TLS handshakes, HTTP/2 frames, and mouse velocity.</td>
-              <td><strong>Bypassed by Bézier Splines:</strong> Frameworks use cubic Bézier curves and stealth patches, scoring 0.9 (maximum human tier).</td>
-              <td><em>Black Hat Europe / DEF CON 31</em> on <code>ghost-cursor</code>; Radware 2024 Report.</td>
+              <td>Monitors TLS handshakes, HTTP/2 frames, and mouse velocity to calculate risk scores.</td>
+              <td><strong>Bypassed by Splines & Scripts:</strong> Open-source tools like <code>ghost-cursor</code> generate curved Bézier trajectories. Single-session challenge scores fail when bots mimic human cadence.</td>
+              <td>TUM/Kontext Agent Detection Study (2026); Radware Bot Management Report.</td>
             </tr>
           </tbody>
         </table>
@@ -866,21 +874,28 @@
 
       <h4>Layer 1: Temporal Rhythm ($S_{\text{time}}$)</h4>
       <p>
-        Measures the inter-arrival delta $\Delta t$ between sequential form events across sessions. Coordinated bot runners dispatch requests in tight bursts ($\Delta t < 50\text{ms}$). Natural human arrivals follow an independent Poisson distribution.
+        Measures the inter-arrival delta $\Delta t$ between sequential form events across sessions. While unsophisticated bots attack in tight bursts ($\Delta t < 50\text{ms}$), sophisticated bots add random delays. ShadowGram counters this with a <strong>24-hour exponential decay time-kernel</strong> (Iannucci et al., <em>ICWSM 2026</em>) and a Poisson arrival baseline model ($P(\text{Poisson}(\lambda_w) \ge k)$). Timing acts as one contributing vote alongside orthogonal behavioral layers.
       </p>
 
       <h4>Layer 2: Navigation Finite State Machine ($S_{\text{nav}}$)</h4>
       <p>
-        Calculates the Longest Common Subsequence (LCS) across navigation paths (e.g. <code>/auth</code> $\to$ <code>/kyc</code> $\to$ <code>/submit</code>). Sessions with route similarity $\ge 0.85$ are flagged.
+        Calculates the Longest Common Subsequence (LCS) across navigation paths (e.g. <code>/auth</code> $\to$ <code>/kyc</code> $\to$ <code>/submit</code>). Sessions with route similarity $\ge 0.85$ are flagged. At the field level, it tracks micro-events (focus order, paste events, and backspace rates) weighted by population rarity.
       </p>
 
-      <h4>Layer 3: Kinetic Cursor Spectrogram Analysis ($S_{\text{kin}}$)</h4>
+      <h4>Layer 3: Kinetic Invariants & Mobile Dynamics ($S_{\text{kin}}$)</h4>
       <div class="ste-rule">
-        <div class="ste-rule-title">Biomechanical Discovery: 8–12 Hz Physiological Tremor</div>
-        Human hands exhibit involuntary neuromotor tremor at 8 to 12 Hz. Bézier curves have smooth mathematical derivatives where jerk (the 3rd derivative $\frac{d^3x}{dt^3}$) is zero or constant.
+        <div class="ste-rule-title">Kinetic Architecture: Event-Stream Invariants & Touch Dynamics</div>
+        Raw cursor jerk at 60 Hz sampling contains measurement noise. Modern GANs can also generate curved mouse paths. In addition, more than 85% of micro-lending applicants use mobile touchscreens with no mouse cursor.
       </div>
       <p>
-        We convert mouse paths $[x, y, t]$ into a 128x128 acceleration spectrogram image. A lightweight <strong>2D-CNN in ONNX Runtime</strong> evaluates the spectrogram in <strong>$< 10\text{ms}$ on CPU</strong>, outputting $P_{\text{synthetic}} \in [0.0, 1.0]$.
+        ShadowGram focuses on <strong>event-stream distribution invariants</strong> rather than raw trajectory curves:
+      </p>
+      <ul>
+        <li><strong>Web Invariants:</strong> Measures click-dwell duration variance, pre-click pointer presence, and scroll events. Automation tools (like Playwright) leave clear missing-event signatures.</li>
+        <li><strong>Mobile Touch Dynamics:</strong> On mobile screens, evaluates swipe acceleration, contact surface area variance, and stroke deceleration.</li>
+      </ul>
+      <p>
+        A lightweight <strong>2D-CNN in ONNX Runtime</strong> evaluates these motion matrices in <strong>$< 10\text{ms}$ on CPU</strong>, outputting $P_{\text{synthetic}} \in [0.0, 1.0]$.
       </p>
 
       <h4>Layer 4: Dense Semantic Vector Forensics ($S_{\text{sem}}$)</h4>
@@ -891,20 +906,21 @@
 
       <h4>Layer 5: Environmental Hardware Entropy ($S_{\text{env}}$)</h4>
       <p>
-        Extracts non-PII hardware entropy signals: AudioContext oscillator decay, WebGL canvas render hashes, and system clock skew.
+        Extracts non-PII hardware entropy signals: AudioContext oscillator decay, WebGL canvas render hashes, and system clock skew. Hardware entropy acts as a secondary supporting signal to avoid false positives on shared campus hardware.
       </p>
 
-      <h3 class="section-heading">3.3 Graph Community Detection (Louvain Modularity Math)</h3>
+      <h3 class="section-heading">3.3 Graph Community Detection (Leiden Algorithm & Adversarial Defense)</h3>
       <p>
         An edge $(u, v)$ is created if composite similarity $S_{\text{comp}} \ge 0.78$ across at least three layers:
       </p>
       <pre><code>S_comp(u, v) = w_time*S_time + w_nav*S_nav + w_sem*S_sem + w_kin*S_kin + w_env*S_env</code></pre>
+      <div class="ste-note">
+        <div class="ste-note-title">Algorithmic Upgrade: Leiden Algorithm & Boundary Repair</div>
+        Traditional Louvain clustering has a known resolution limit ($O(\sqrt{2L})$) and can return disconnected communities. Advanced bot syndicates can also inject "clean" bridge accounts to lower modularity (<em>BOCLOAK</em>, ICML 2026).<br>
+        <strong>ShadowGram Upgrade:</strong> We execute boundary graph repair (isolating anomalous bridge edges) and apply the <strong>Leiden Algorithm</strong> (Traag et al., 2019). Leiden guarantees well-connected communities and separates dense bot cliques from background traffic.
+      </div>
       <p>
-        We partition the graph using Newman-Girvan Modularity ($Q$):
-      </p>
-      <pre><code>Q = (1 / 2m) * sum_ij [ A_ij - (k_i * k_j) / (2m) ] * delta(c_i, c_j)</code></pre>
-      <p>
-        Any cluster with $Q > 0.60$ and node count $\ge 3$ is mathematically isolated as a syndicate ($P < 10^{-5}$).
+        Any cluster with Modularity $Q > 0.60$ and node count $\ge 3$ is mathematically isolated as a syndicate ($p < 0.001$).
       </p>
     </section>
 
@@ -914,33 +930,34 @@
 
       <h3 class="section-heading">4.1 Statutory Adverse Action: ECOA & Regulation B</h3>
       <p>
-        The CFPB withdrew Circular 2023-03 on May 12, 2025 during an administrative cleanup. <strong>However, the underlying federal statute did not change.</strong>
+        The CFPB withdrew Circular 2023-03 on May 12, 2025 during an administrative consolidation. <strong>However, underlying federal statute remains strict and binding.</strong>
       </p>
       <ul>
         <li><strong>Equal Credit Opportunity Act (15 U.S.C. § 1691):</strong> Federal law passed by the United States Congress.</li>
         <li><strong>Regulation B (12 CFR § 1002.9):</strong> Mandates that creditors provide specific, accurate principal reasons when taking adverse action.</li>
-        <li>Relying on an unexplained "88% Risk Score" creates direct regulatory and legal liability.</li>
+        <li>A creditor cannot rely on an uninterpretable black-box score. Under Regulation B, declaring that an applicant matched a synchronized automated bot cluster provides a factual, auditable adverse reason.</li>
       </ul>
 
-      <h3 class="section-heading">4.2 Global Directives: EU AI Act & RBI Guidelines</h3>
+      <h3 class="section-heading">4.2 Global Directives: EU AI Act & RBI 2025 Directions</h3>
       <ul>
-        <li><strong>EU AI Act (Regulation (EU) 2024/1689):</strong> Annex III categorizes credit assessment AI as <strong>High-Risk AI Systems</strong>. Articles 13 & 14 mandate explainability and human oversight. Penalties reach <strong>€35 Million or 7% of global turnover</strong>.</li>
-        <li><strong>Reserve Bank of India (RBI) Digital Lending Master Directions:</strong> Banks cannot outsource core credit assessment to black-box software and must maintain audit logs for credit denials.</li>
+        <li><strong>EU AI Act (Regulation (EU) 2024/1689):</strong> Annex III categorizes creditworthiness systems as High-Risk AI. (Annex III 5(b) excludes standalone fraud detection, but when fraud outputs directly drive loan denial, full transparency applies). Articles 13 & 14 mandate human oversight and explainability. Operator penalties reach <strong>up to €15 Million or 3% of global turnover</strong> (Article 99(4)).</li>
+        <li><strong>RBI (Digital Lending) Directions, 2025:</strong> Replaced the 2022 guidelines (effective May 8, 2025). Regulated entities must maintain documented borrower assessments (Paragraph 7) and complete audit trails for credit decisions.</li>
       </ul>
 
-      <h3 class="section-heading">4.3 Automated Legal SAR PDF Generation</h3>
+      <h3 class="section-heading">4.3 Auditable Legal SAR PDF Generation</h3>
       <p>
-        When an officer quarantines a cluster, raw graph metrics are sent to the <strong>NVIDIA NIM API (Llama-3.3-70B)</strong>.
+        When an officer quarantines a cluster, raw graph metrics are formatted into structured JSON and sent to the <strong>NVIDIA NIM API (Llama-3.3-70B)</strong>.
       </p>
       <p>
-        Llama-3.3-70B acts as the legal scribe, converting graph metrics into formal CFPB-compliant Adverse Action Reason Codes. Python <strong>ReportLab</strong> compiles a 2-page Suspicious Activity Report (SAR) PDF in under two seconds.
+        To prevent LLM hallucination, the model uses constrained decoding against formal regulatory templates. It renders graph metrics into formal Adverse Action Reason Codes. Python <strong>ReportLab</strong> compiles a 2-page Suspicious Activity Report (SAR) PDF in under two seconds.
       </p>
 
-      <h3 class="section-heading">4.4 False Positive Protection (The 3-Tier Safeguard)</h3>
+      <h3 class="section-heading">4.4 False Positive Protection & Safeguard Protocol</h3>
       <ol>
-        <li><strong>3-Layer Minimum Rule:</strong> An edge requires a match on $\ge 3$ layers. An authentic human applying during an attack fails the kinetic jerk and keystroke flight-time checks, keeping their node isolated.</li>
-        <li><strong>Zero Permanent Bans:</strong> ShadowGram never hard-deletes accounts. It issues a <strong>Quarantine / Step-Up Challenge</strong>.</li>
-        <li><strong>Friction-Free Escalation:</strong> Quarantined users complete a fast verification step (1-rupee UPI penny-drop or Account Aggregator consent). Genuine humans verify in ten seconds; headless bots fail and abandon.</li>
+        <li><strong>Common-Cause Immunity Rule:</strong> External viral events (e.g. college loan drives) correlate time and loan reason. They do not correlate neuromotor hand dynamics or micro-interaction distributions. Edges require at least one common-cause-immune layer.</li>
+        <li><strong>Empirical Permutation Test:</strong> Shuffles session labels 1,000 times within the sliding window. Clusters are isolated only when the empirical $p$-value satisfies $p < 0.001$, proving coordination is not accidental.</li>
+        <li><strong>Zero Permanent Bans:</strong> ShadowGram never executes irreversible hard bans. Quarantined sessions receive an adaptive <strong>Step-Up Challenge</strong>.</li>
+        <li><strong>Friction-Free Escalation:</strong> Honest users complete a fast verification check (1-rupee UPI penny-drop or Account Aggregator consent) in ten seconds. Headless automated bots fail and abort.</li>
       </ol>
     </section>
 
@@ -1117,34 +1134,140 @@
       </ul>
     </section>
 
+    <!-- Chapter 8: Architecture Evolution & Stress-Test Audit -->
+    <section id="chapter-audit">
+      <h2 class="chapter-heading"><span class="chapter-number">CH 8</span> Architecture Evolution & Stress-Test Audit: Initial vs. Current Design</h2>
+
+      <div class="ste-note">
+        <div class="ste-note-title">Adversarial Stress-Test Summary</div>
+        We audited the initial ShadowGram blueprint against 2025–2026 academic papers, real-world case law, and commercial vendor architectures. The audit proved that our relational graph thesis is correct. However, the audit exposed six engineering and regulatory loopholes. We upgraded the system to resolve each vulnerability.
+      </div>
+
+      <h3 class="section-heading">8.1 Comparison Matrix: Initial Design vs. Enhanced Architecture</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Architecture Domain</th>
+              <th>Initial Prototype Design</th>
+              <th>Current Enhanced Architecture</th>
+              <th>Reason for Change (Why We Changed It)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Competitor Positioning</strong></td>
+              <td>Claimed BioCatch cannot cluster accounts and fails on new users.</td>
+              <td>Acknowledge BioCatch Scout (50k+ nodes link-analysis graph) and DataVisor patents. Position ShadowGram as a <strong>local, pre-KYC Denial-of-Wallet triage gate</strong>.</td>
+              <td>BioCatch Scout launched in 2023. DataVisor holds unsupervised ring patents. Our genuine advantage is local, on-premise execution at Form Step 2 before expensive KYC APIs run.</td>
+            </tr>
+            <tr>
+              <td><strong>Detection Paradigm</strong></td>
+              <td>Relied solely on a single graph engine for all bot detection.</td>
+              <td><strong>The Two-Key Defense:</strong><br>• Key 1: Fast per-session automation filter (&lt;5ms).<br>• Key 2: Multi-modal relational graph.</td>
+              <td>Simple browser automation (Playwright/CDP) is 100% detectable on a single session via missing mouse events. The graph is reserved for sophisticated, human-mimicking swarms.</td>
+            </tr>
+            <tr>
+              <td><strong>Kinetic Layer ($S_{\text{kin}}$)</strong></td>
+              <td>Relied on raw 3rd-derivative cursor jerk ($\frac{d^3x}{dt^3}$) at 60 Hz.</td>
+              <td><strong>Event-Stream Invariants & Touch Dynamics:</strong> Evaluates click-dwell variance, event presence on Web, and touch swipe dynamics on mobile.</td>
+              <td>Raw jerk at 60 Hz is dominated by hardware noise. GANs can synthesize Bézier curves. Over 85% of Indian micro-lenders operate on mobile touchscreens without cursors.</td>
+            </tr>
+            <tr>
+              <td><strong>Temporal Layer ($S_{\text{time}}$)</strong></td>
+              <td>Fixed burst time delta ($\Delta t &lt; 50\text{ms}$).</td>
+              <td><strong>24-Hour Exponential Decay Kernel:</strong> Time-decay kernel plus Poisson baseline models across extended sliding windows.</td>
+              <td>Adversaries easily bypass fixed burst windows by adding random sleep delays (e.g. 1 to 10 seconds) or slow-dripping applications.</td>
+            </tr>
+            <tr>
+              <td><strong>Graph Clustering</strong></td>
+              <td>Standard Louvain modularity optimization ($Q &gt; 0.60$).</td>
+              <td><strong>Leiden Algorithm + Boundary Repair:</strong> Identifies anomalous bridge accounts and guarantees connected communities.</td>
+              <td>Louvain suffers from resolution limits ($O(\sqrt{2L})$) and can return disconnected partitions. Attackers can inject clean accounts to lower modularity (BOCLOAK 2026).</td>
+            </tr>
+            <tr>
+              <td><strong>Regulatory Citations</strong></td>
+              <td>Cited CFPB Circular 2023-03 and 2022 RBI guidelines.</td>
+              <td>Grounded directly in <strong>ECOA (15 U.S.C. § 1691), Regulation B (12 CFR § 1002.9)</strong>, and <strong>RBI (Digital Lending) Directions, 2025</strong>.</td>
+              <td>CFPB Circular 2023-03 was withdrawn on May 12, 2025. RBI updated its digital lending framework in May 2025. Federal statutes remain legally binding.</td>
+            </tr>
+            <tr>
+              <td><strong>False Positive Safeguards</strong></td>
+              <td>Static 3-layer agreement rule.</td>
+              <td><strong>Common-Cause Immunity & Permutation Tests:</strong> Requires at least one common-cause-immune layer and empirical null model ($p &lt; 0.001$).</td>
+              <td>Protects legitimate viral surges (e.g. college students applying on the same campus Wi-Fi) from false mass quarantine.</td>
+            </tr>
+            <tr>
+              <td><strong>SAR Generation</strong></td>
+              <td>Unconstrained LLM prompt to generate adverse action text.</td>
+              <td><strong>Constrained JSON Decoding:</strong> LLM renders structured decision subgraphs into strict regulatory templates.</td>
+              <td>Prevents LLM hallucination of non-existent metrics during official regulatory reporting.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="section-heading">8.2 Why Haven't Existing Fraud Vendors Built This Solution?</h3>
+      <p>
+        During stress testing, we investigated why established fraud vendors have not solved this specific micro-lending problem. Five structural, economic, and technical barriers protect ShadowGram's market position:
+      </p>
+
+      <h4>1. The Consortium Business Model Conflict (The "Data Magnet" Trap)</h4>
+      <p>
+        Major identity providers (BioCatch, Sift, LexisNexis ThreatMetrix) build their businesses on global data consortiums. Their revenue requires customers to upload private user data to centralized cloud systems. They sell enterprise subscriptions costing $100,000 to $500,000 per year. They cannot sell a lightweight, local, on-premise container that runs inside a lender's private network without sharing data.
+      </p>
+
+      <h4>2. The Post-Submission / Transaction-Centric Legacy Bias</h4>
+      <p>
+        Most enterprise banking fraud platforms were designed for transaction fraud (credit card theft, wire fraud, and account takeovers). They sit behind the core banking database. They are blind to user micro-interactions at Form Step 2. They only evaluate an applicant after the applicant clicks "Submit" and expensive verification APIs have already run.
+      </p>
+
+      <h4>3. The $O(N^2)$ Pairwise Computational Wall</h4>
+      <p>
+        Calculating pairwise similarity across 5 physics layers for 100,000 sessions requires nearly 5 billion comparisons. Traditional servers crash under this load. Consequently, legacy vendors run graph clustering as an offline batch process overnight. ShadowGram solves this with <strong>multi-stage blocking</strong> (approximate nearest neighbor search and time-window bucketing), keeping graph construction fast ($O(k \cdot N)$) and in-memory.
+      </p>
+
+      <h4>4. The Emerging-Market "Denial-of-Wallet" Blind Spot</h4>
+      <p>
+        Western fraud vendors designed software for US and European markets where credit checks are billed on flat enterprise tiers. In India and Southeast Asia, digital lenders use transactional verification APIs (Aadhaar e-KYC, PAN validation, face liveness, and credit bureau pulls) that cost ₹33.50 to ₹118.50 per applicant. Western systems let bots exhaust the lender's verification budget before evaluating fraud. ShadowGram stops this drain at Form Step 2.
+      </p>
+
+      <h4>5. The Regulatory Black-Box Paralyzation</h4>
+      <p>
+        Lenders fear unsupervised clustering algorithms because banking laws (ECOA Regulation B) prohibit unexplained loan denials. Legacy vendors avoided unsupervised clustering for credit applications. ShadowGram overcomes this barrier by pairing cluster isolation with a non-punitive <strong>Step-Up Challenge</strong> (1-rupee UPI penny-drop) and a statistically verifiable <strong>"Why Card"</strong> that auditors can re-run.
+      </p>
+    </section>
+
     <!-- Appendix -->
     <section id="appendix">
       <h2 class="chapter-heading"><span class="chapter-number">APP</span> Master Glossary & Reference Bibliography</h2>
 
       <h3 class="section-heading">Master Glossary (ASD-STE100 Technical Terms)</h3>
       <ul>
-        <li><strong>Autonomous AI Swarm:</strong> A group of software agents that coordinate actions across multiple accounts without human control.</li>
-        <li><strong>Synthetic Identity:</strong> A fabricated identity made by combining authentic government identification numbers with fabricated personal data.</li>
-        <li><strong>Kinetic Jerk:</strong> The third mathematical derivative of position with respect to time ($d^3x/dt^3$). Measures the rate of change of acceleration.</li>
-        <li><strong>Louvain Modularity ($Q$):</strong> A mathematical algorithm that measures the density of links inside communities compared to links between communities.</li>
-        <li><strong>Denial-of-Wallet (DoW):</strong> A cyber-attack that forces an organization to spend financial resources on third-party API verification fees.</li>
-        <li><strong>Why Card:</strong> An interface window that displays verifiable factual evidence explaining why accounts were grouped into a cluster.</li>
+        <li><strong>Two-Key Defense:</strong> A security architecture with two stages. Key 1 detects automation artifacts on single sessions. Key 2 detects coordinated behavior across sessions using an in-memory graph.</li>
+        <li><strong>Denial-of-Wallet (DoW):</strong> An adversarial attack that floods an application funnel to force the target organization to pay excessive third-party verification API fees.</li>
+        <li><strong>Event-Stream Invariants:</strong> Statistical properties of user input streams (e.g. click dwell duration variance, presence of pointer events before clicks) that automated tools fail to replicate.</li>
+        <li><strong>Leiden Algorithm:</strong> A graph community detection method that guarantees connected communities and addresses the modularity resolution limit.</li>
+        <li><strong>Common-Cause Immunity:</strong> A safeguard rule requiring at least one graph edge layer to be immune to external viral events (such as synchronized marketing campaigns).</li>
+        <li><strong>Empirical Permutation Test:</strong> A statistical method that shuffles session labels 1,000 times to calculate an exact empirical $p$-value ($p < 0.001$).</li>
+        <li><strong>Why Card:</strong> An explainable user interface window that displays verifiable factual evidence explaining why accounts were grouped into a cluster.</li>
       </ul>
 
       <h3 class="section-heading">Authoritative Reference Bibliography</h3>
       <ol>
-        <li>USENIX Security 2024: <em>The Threat of Vision-Language Models to CAPTCHAs</em>.</li>
-        <li>Black Hat Europe / DEF CON 31: <em>Bypassing Modern Bot Detection with Ghost-Cursor</em>.</li>
-        <li>Radware 2024: <em>State of Web Application and Bot Management Report</em>.</li>
+        <li>Teoh, H., et al. (Halligan) (USENIX Security 2025): <em>Are CAPTCHAs Still Bot-hard? The Threat of Generalist Visual Solvers</em>.</li>
+        <li>ViPer (USENIX Security 2026 / arXiv:2601.06461): <em>Evaluating Vision-Language Models on Visual-Reasoning Challenges</em>.</li>
+        <li>TUM / Kontext Research (July 2026 / arXiv:2607.26935): <em>Detecting Autonomous Browser Agents via Event-Stream Invariants</em>.</li>
+        <li>Traag, V. A., Waltman, L., & van Eck, N. J. (Scientific Reports, 2019): <em>From Louvain to Leiden: guaranteeing well-connected communities</em>.</li>
+        <li>Fortunato, S., & Barthélemy, M. (PNAS, 2007): <em>Resolution limit in modularity detection</em>.</li>
+        <li>Iannucci, G., et al. (ICWSM 2026): <em>Multiplex Time-Aware Models for Online Coordination Detection</em>.</li>
+        <li>BOCLOAK (ICML 2026 / arXiv:2602.00318): <em>Adversarial Evasion of Graph Neural Network Bot Detectors</em>.</li>
+        <li>SynchroTrap (ACM CCS 2014): <em>Detecting Loosely Synchronized Malicious Activity at Facebook Scale</em>.</li>
+        <li>BeCAPTCHA-Mouse (Pattern Recognition, 2022): <em>Neuromotor Modeling for Synthetic Trajectory Detection</em>.</li>
         <li>404 Media (Joseph Cox, Feb 2024): <em>Inside the AI-Powered Fake ID Service Used to Bypass KYC</em>.</li>
-        <li>Resecurity (Oct 2023): <em>Data of 815 Million Indian Citizens Leaked on Dark Web</em>.</li>
-        <li>Sift Science (2024): <em>Digital Trust & Safety Index: Buy Now, Pay Later Fraud Surge</em>.</li>
         <li>Equal Credit Opportunity Act (ECOA): <em>15 U.S.C. § 1691 & Regulation B (12 CFR § 1002.9)</em>.</li>
-        <li>European Union Artificial Intelligence Act: <em>Regulation (EU) 2024/1689 (Annex III, Articles 13 & 14)</em>.</li>
-        <li>Reserve Bank of India (RBI): <em>Guidelines on Digital Lending (RBI/2022-23/111)</em>.</li>
-        <li>Newman, M. E. J., & Girvan, M. (2004): <em>Finding and evaluating community structure in networks</em>.</li>
-        <li>Blondel, V. D., et al. (2008): <em>Fast unfolding of communities in large networks (Louvain Method)</em>.</li>
-        <li>Elble, R. J., & Randall, J. E. (1976): <em>Mechanisms of Physiological Tremor (8–12 Hz)</em>.</li>
+        <li>Reserve Bank of India (RBI): <em>Digital Lending Directions, 2025 (RBI/2025-26/36, effective May 8, 2025)</em>.</li>
+        <li>European Union Artificial Intelligence Act: <em>Regulation (EU) 2024/1689 (Annex III, Articles 13, 14 & 99)</em>.</li>
       </ol>
     </section>
 

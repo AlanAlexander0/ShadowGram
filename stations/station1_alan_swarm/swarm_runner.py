@@ -1,5 +1,5 @@
 """
-simulation/swarm_runner.py - Red-Team Swarm Runner for ShadowGram
+stations/station1_alan_swarm/swarm_runner.py - Red-Team Swarm Runner for ShadowGram
 Assignee: Alan E Alexander (Role 3: Red-Team Swarm Runner & Client Telemetry Lead)
 Document Code: SG-PROTO-00 / Task 3.2
 
@@ -11,6 +11,9 @@ High-Performance Architecture:
 5. Dual-Mode execution:
    - Full Playwright Browser Mode: Drives live DOM on Laptop 3.
    - Direct Synthetic Telemetry Mode: Dispatches compliant telemetry to Laptop 2 for instant testing.
+6. Two Sophistication Modes:
+   - --mode naive: Triggers Key 1 Fast Automation Filter (<5ms).
+   - --mode stealth: Evades Key 1, intercepted by Key 2 Relational Physics Graph.
 """
 
 import argparse

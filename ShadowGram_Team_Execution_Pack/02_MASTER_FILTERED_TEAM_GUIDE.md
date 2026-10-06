@@ -28,12 +28,12 @@ Instead of asking if one account is fake, ShadowGram connects the dots:
 
 When judges ask: *"Where does this actually happen?"*, deliver this exact, 10/10 fact-checked response:
 
-### 1. Documented Industry Fact: Digital Micro-Lending Regulatory Exposure
-* **The Legal Evidence:** In *M/s Krazybee Services Private Limited vs. Directorate of Enforcement* (High Court of Telangana, March 2025), investigative proceedings pursuant to 43 FIRs led to provisional attachment orders of **~₹65.87 Crore** under the Prevention of Money Laundering Act (PMLA).
+### 1. Documented Industry Context: Digital Lending Regulatory Scrutiny
+* **The Legal Evidence:** Digital micro-lenders face intense regulatory scrutiny under PMLA and RBI Directions. In *M/s Krazybee Services vs. Directorate of Enforcement*, the High Court of Telangana quashed provisional attachment proceedings on March 11, 2025, underlining that automated lending platforms must maintain strict, auditable borrower assessment trails to avoid regulatory exposure.
 * **The Core Lesson:** Automated micro-credit pipelines face catastrophic operational and legal clawback risks when automated underwriting lacks multi-dimensional behavioral governance.
 
 ### 2. Documented Network Trend: BNPL Payment Fraud Surge (+211%)
-* **The Verified Metric:** Sift’s Digital Trust & Safety Index confirmed that **attempted payment fraud targeting Buy Now, Pay Later (BNPL) surged by +211% year-over-year** in their global network (compared to +13% in broad fintech).
+* **The Verified Metric:** Sift’s Digital Trust & Safety Index confirmed that **attempted payment fraud targeting Buy Now, Pay Later (BNPL) surged by +211% year-over-year** in their global network (Sift Q1 2023 Index, comparing annual merchant trends against +13% fintech baseline).
 * **The Vulnerability:** Fraudsters exploit the latency gap between instant credit checkout and asynchronous bureau reporting.
 
 ### 3. Our Evaluated Threat Models (Adversarial Simulation Scenarios)
@@ -41,36 +41,36 @@ When judges ask: *"Where does this actually happen?"*, deliver this exact, 10/10
 * **Simulation Scenario B (Denial-of-Wallet API Bleed):** Under UIDAI’s official ₹3.00 e-KYC regulation and commercial API aggregators (PAN ₹1.50–₹3.50, Face Liveness ₹4–₹10, Bureau ₹25–₹100), full onboarding costs **₹33.50 to ₹118.50 per applicant**. A flood of 100,000 synthetic applications can exhaust **₹33.5 Lakh to ₹1.18 Crore** in downstream verification fees even when rejected.
 * **ShadowGram Solution:** Quarantines the syndicate at Step 2 of the form *before* paid third-party verification APIs are invoked!
 
-
 ---
 
 ## 3. Competitor Analysis: Why Existing Billion-Dollar Tools Fail
 
-If a judge asks: *"Why can't Sift, BioCatch, or Arkose Labs stop this?"*, here is your exact answer:
+If a judge asks: *"Why can't Sift, BioCatch, or DataVisor stop this?"*, here is your exact answer:
 
 ```
 ┌─────────────────────────────────┬─────────────────────────────────┬─────────────────────────────────┐
-│ Competitor System               │ How They Defend Today           │ Why They Fail Against AI Swarms │
+│ Competitor System               │ How They Defend Today           │ Where ShadowGram Wins           │
 ├─────────────────────────────────┼─────────────────────────────────┼─────────────────────────────────┤
-│ 1. BioCatch                     │ Behavioral biometrics on single │ Requires a user's past history. │
-│    (Behavioral Biometrics)      │ users (learns your unique habits│ Fails completely on brand-new   │
-│                                 │ over months of usage).          │ synthetic accounts with no past!│
+│ 1. BioCatch                     │ Cloud consortium biometrics and │ Sells expensive cloud SaaS;     │
+│    (Scout & Biometrics)         │ BioCatch Scout link graph.      │ cannot run on-premise Pre-KYC   │
+│                                 │                                 │ triage to stop API fee bleed!   │
 ├─────────────────────────────────┼─────────────────────────────────┼─────────────────────────────────┤
-│ 2. Arkose Labs                  │ Interactive puzzles, CAPTCHAs,  │ USENIX 2025 research (Halligan) │
+│ 2. DataVisor                    │ Unsupervised ring detection and │ Sits in post-submission data    │
+│    (Unsupervised Clustering)    │ enterprise graph clustering.    │ lakes; high false-positive risk │
+│                                 │                                 │ during viral flash crowds!      │
+├─────────────────────────────────┼─────────────────────────────────┼─────────────────────────────────┤
+│ 3. Arkose Labs                  │ Interactive puzzles, CAPTCHAs,  │ USENIX 2025 research (Halligan) │
 │    (Bot Challenge Management)   │ and proof-of-work challenges.   │ proved Vision-LLMs solve puzzles│
-│                                 │                                 │ with over 70% accuracy!         │
+│                                 │                                 │ with 60.7% to 70.6% accuracy!   │
 ├─────────────────────────────────┼─────────────────────────────────┼─────────────────────────────────┤
-│ 3. Sift & ThreatMetrix          │ Global identity graphs linking  │ Bots use residential rotating   │
-│    (Digital Trust Consortium)   │ shared IPs, credit cards, or    │ proxies and anti-detect browsers│
-│                                 │ device GUIDs.                   │ — they share ZERO static IDs!   │
-├─────────────────────────────────┼─────────────────────────────────┼─────────────────────────────────┤
-│ 4. Cloudflare / DataDome        │ Perimeter WAF checking IP       │ Bots inject real Chrome browser │
-│    (Edge Bot Detection)         │ reputation and TLS headers.     │ profiles via anti-detect tools. │
+│ 4. Sift & ThreatMetrix          │ Global identity graphs linking  │ Bots use residential rotating   │
+│    (Digital Trust Consortium)   │ shared IPs or device hashes.    │ 4G/5G mobile proxies & spoofing │
+│                                 │                                 │ — they share ZERO static IDs!   │
 └─────────────────────────────────┴─────────────────────────────────┴─────────────────────────────────┘
 ```
 
 **ShadowGram's Competitive Advantage:**  
-We require **zero prior user history**, rely on **zero shared IPs or device IDs**, and require **zero user CAPTCHA friction**. We evaluate *relational interaction physics* in real time across active sessions.
+We require **zero prior user history**, rely on **zero shared IPs or device IDs**, and require **zero user CAPTCHA friction**. We evaluate *relational interaction physics* in real time at Form Step 2 before third-party verification APIs fire.
 
 ---
 

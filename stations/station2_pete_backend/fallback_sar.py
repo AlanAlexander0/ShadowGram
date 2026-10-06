@@ -4,7 +4,7 @@ from typing import Dict, Any
 def deterministic_sar_narrative(cluster_data: Dict[str, Any]) -> str:
     """
     Instantaneous (<1ms) fallback legal narrative generator.
-    Satisfies CFPB Circular 2023-03 and ECOA Regulation B requirements
+    Satisfies ECOA Regulation B (12 CFR § 1002.9) and EU AI Act Articles 13/14 requirements
     for specific, factual adverse action reason codes without black-box scores.
     """
     cluster_id = cluster_data.get("cluster_id", 1)

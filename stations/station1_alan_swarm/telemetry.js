@@ -1,5 +1,6 @@
 /**
  * ShadowGram Client-Side Telemetry SDK (telemetry.js)
+ * Station 1 & Station 3 Telemetry Library
  * Document Code: SG-PROTO-00 / Task 3.1
  * Assignee: Alan E Alexander (Role 3: Red-Team Swarm Runner & Client Telemetry Lead)
  * 
@@ -8,6 +9,7 @@
  * 2. 50ms Throttling on cursor movements to guarantee zero UI lag during live judge testing.
  * 3. Self-contained pure JS HMAC-SHA256 for cryptographic telemetry signing (works on non-HTTPS LAN).
  * 4. Buffers and flushes to Laptop 2 (POST /telemetry) every 1.0s or via navigator.sendBeacon.
+ * 5. Event-Stream Invariant Detection: Captures click-dwell duration, pre-click hover counts, and touch dynamics.
  */
 
 (function (window, document) {
@@ -55,7 +57,6 @@
     const mathPow = Math.pow;
     const maxWord = mathPow(2, 32);
     let i, j;
-    const result = '';
     const words = [];
     const asciiBitLength = ascii.length * 8;
     let hash = sha256.h = sha256.h || [];
@@ -281,7 +282,6 @@
     for (let i = 3; i < coords.length; i++) {
       const dt = coords[i][2] - coords[i - 1][2];
       if (dt > 0.001) {
-        // d3x/dt3 derivative approximation
         const dx1 = coords[i][0] - coords[i - 1][0];
         const dx0 = coords[i - 1][0] - coords[i - 2][0];
         const d2x = (dx1 - dx0) / dt;
@@ -298,7 +298,6 @@
     const batch = eventQueue.slice();
     eventQueue = [];
 
-    // Send each packet or batch to Laptop 2
     for (let i = 0; i < batch.length; i++) {
       const packet = batch[i];
       const payloadStr = JSON.stringify(packet);
@@ -313,7 +312,6 @@
           body: payloadStr,
           keepalive: true
         }).catch(function (err) {
-          // Silent local failover: does not crash the client UI
           console.debug('[ShadowGram Telemetry] Ingress offline:', err.message);
         });
       }

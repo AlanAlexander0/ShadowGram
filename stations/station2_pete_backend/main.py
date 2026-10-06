@@ -10,16 +10,28 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse, JSONResponse, Response
 from sqlalchemy.orm import Session
 
-from backend.models import (
-    TelemetryEvent, GraphResponse, QuarantineRequest, QuarantineResponse,
-    StepUpVerifyRequest, StepUpVerifyResponse, DoWStatsResponse,
-    SessionRecord, TelemetryRecord, ClusterRecord
-)
-from backend.database import init_db, get_db
-from backend.graph_engine import ShadowGraphEngine
-from backend.mock_simulation import populate_mock_cyber_range
-from backend.nim_client import generate_sar_report_narrative
-from backend.sar_generator import generate_sar_pdf
+try:
+    from models import (
+        TelemetryEvent, GraphResponse, QuarantineRequest, QuarantineResponse,
+        StepUpVerifyRequest, StepUpVerifyResponse, DoWStatsResponse,
+        SessionRecord, TelemetryRecord, ClusterRecord
+    )
+    from database import init_db, get_db
+    from graph_engine import ShadowGraphEngine
+    from mock_simulation import populate_mock_cyber_range
+    from nim_client import generate_sar_report_narrative
+    from sar_generator import generate_sar_pdf
+except ImportError:
+    from backend.models import (
+        TelemetryEvent, GraphResponse, QuarantineRequest, QuarantineResponse,
+        StepUpVerifyRequest, StepUpVerifyResponse, DoWStatsResponse,
+        SessionRecord, TelemetryRecord, ClusterRecord
+    )
+    from backend.database import init_db, get_db
+    from backend.graph_engine import ShadowGraphEngine
+    from backend.mock_simulation import populate_mock_cyber_range
+    from backend.nim_client import generate_sar_report_narrative
+    from backend.sar_generator import generate_sar_pdf
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -30,12 +42,12 @@ async def lifespan(app: FastAPI):
 # Initialize FastAPI App
 app = FastAPI(
     title="ShadowGram Forensics Gateway",
-    version="1.0.0",
+    version="2.0.0",
     description="In-flight Behavioral Graph Forensics & Autonomous Swarm Quarantine Engine",
     lifespan=lifespan
 )
 
-# Configure Permissive CORS for Local Hotspot Multi-Laptop LAN
+# Permissive CORS for Local Hotspot LAN
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -44,7 +56,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Global In-Memory Engines
+# Global Engines
 graph_engine = ShadowGraphEngine(window_seconds=600.0, edge_threshold=0.78)
 SHARED_HMAC_SALT = os.getenv("SHADOWGRAM_SALT", "shadowgram-2026-secret-salt").encode()
 
@@ -69,13 +81,10 @@ class ConnectionManager:
 
 ws_manager = ConnectionManager()
 
-# ---------------------------------------------------------
-# HMAC Verification Utility
-# ---------------------------------------------------------
 def verify_hmac(session_id: str, timestamp: float, signature: str) -> bool:
-    """Verifies client telemetry packet integrity against cURL forgery."""
+    """Verifies client telemetry packet integrity."""
     if not signature:
-        return True  # Permissive during initial testing, enforce if provided
+        return True
     
     salts = [
         SHARED_HMAC_SALT,
@@ -94,7 +103,7 @@ def verify_hmac(session_id: str, timestamp: float, signature: str) -> bool:
     return False
 
 # ---------------------------------------------------------
-# REST API Endpoints (Conforming strictly to SG-PROTO-00)
+# REST API Endpoints (Conforming to SG-PROTO-00)
 # ---------------------------------------------------------
 
 @app.get("/health")
@@ -102,7 +111,7 @@ def health_check():
     """Heartbeat probe for local connectivity verification."""
     return {
         "status": "online",
-        "service": "ShadowGram Core Engine",
+        "service": "ShadowGram Core Engine v2.0",
         "active_sessions": len(graph_engine.sessions),
         "edges_count": graph_engine.graph.number_of_edges(),
         "timestamp": time.time()
@@ -114,14 +123,13 @@ async def receive_telemetry(event: TelemetryEvent, db: Session = Depends(get_db)
     Ingests live telemetry packets from Laptop 1 (Playwright Swarm) and Laptop 3 (AthenaPay App).
     Updates relational graph, logs to SQLite, and broadcasts event to 3D Cockpit.
     """
-    # HMAC verification
     if event.telemetry_hmac:
         if not verify_hmac(event.session_id, event.timestamp, event.telemetry_hmac):
             raise HTTPException(status_code=401, detail="Invalid HMAC Telemetry Signature")
 
     payload_dict = event.payload.model_dump()
 
-    # Ingest into in-memory graph engine
+    # Ingest into graph engine
     graph_engine.ingest_event(
         session_id=event.session_id,
         account_id=event.account_id,
@@ -130,9 +138,8 @@ async def receive_telemetry(event: TelemetryEvent, db: Session = Depends(get_db)
         payload=payload_dict
     )
 
-    # Persist asynchronously to SQLite
+    # Persist to SQLite
     try:
-        # Update or create session record
         sess_rec = db.query(SessionRecord).filter(SessionRecord.account_id == event.account_id).first()
         if not sess_rec:
             sess_rec = SessionRecord(
@@ -143,7 +150,6 @@ async def receive_telemetry(event: TelemetryEvent, db: Session = Depends(get_db)
             )
             db.add(sess_rec)
 
-        # Log event record
         ev_rec = TelemetryRecord(
             session_id=event.session_id,
             account_id=event.account_id,
@@ -162,7 +168,7 @@ async def receive_telemetry(event: TelemetryEvent, db: Session = Depends(get_db)
         db.rollback()
         print(f"[Telemetry DB Error] {e}")
 
-    # Broadcast event to connected 3D WebGL cockpits
+    # Broadcast event
     await ws_manager.broadcast({
         "type": "TELEMETRY_EVENT",
         "account_id": event.account_id,
@@ -175,7 +181,7 @@ async def receive_telemetry(event: TelemetryEvent, db: Session = Depends(get_db)
 
 @app.get("/api/graph", response_model=GraphResponse)
 def get_graph():
-    """Returns current active nodes, links, clusters, and Louvain modularity score Q."""
+    """Returns active nodes, links, clusters, and Louvain modularity score Q."""
     return graph_engine.compute_clusters_and_modularity()
 
 @app.post("/api/quarantine", response_model=QuarantineResponse)
@@ -206,7 +212,7 @@ async def quarantine_cluster(req: QuarantineRequest, db: Session = Depends(get_d
         db.rollback()
         print(f"[Quarantine DB Error] {e}")
 
-    # Broadcast quarantine update to WebSockets
+    # Broadcast quarantine update
     await ws_manager.broadcast({
         "type": "QUARANTINE_TRIGGERED",
         "cluster_id": req.cluster_id,
@@ -227,7 +233,7 @@ async def quarantine_cluster(req: QuarantineRequest, db: Session = Depends(get_d
 @app.post("/api/step-up/verify", response_model=StepUpVerifyResponse)
 async def verify_step_up(req: StepUpVerifyRequest, db: Session = Depends(get_db)):
     """
-    Verifies a quarantined user completing an out-of-band Step-Up Challenge (e.g., 1-rupee UPI penny-drop).
+    Verifies a quarantined user completing an out-of-band Step-Up Challenge (₹1 UPI penny-drop).
     Restores legitimate account to active state in under 10 seconds.
     """
     success = graph_engine.verify_step_up(req.session_id, req.account_id, req.method)
@@ -267,20 +273,14 @@ async def verify_step_up(req: StepUpVerifyRequest, db: Session = Depends(get_db)
 
 @app.get("/api/dow-stats", response_model=DoWStatsResponse)
 def get_dow_stats():
-    """
-    Returns live Denial-of-Wallet (DoW) economic defense metrics:
-    Capital saved by terminating synthetic bots at Form Step 2 before fee-bearing KYC APIs.
-    """
+    """Returns live Denial-of-Wallet (DoW) economic defense metrics."""
     stats = graph_engine.get_dow_stats()
     return DoWStatsResponse(**stats)
 
 @app.get("/api/sar/pdf/{cluster_id}")
 @app.get("/api/sar/pdf")
 async def get_sar_pdf(cluster_id: int = 1):
-    """
-    Compiles and streams a formal 2-page Suspicious Activity Report (SAR) PDF
-    conforming to ECOA Regulation B (12 CFR § 1002.9) and EU AI Act Articles 13 & 14.
-    """
+    """Compiles and streams a formal 2-page Suspicious Activity Report (SAR) PDF."""
     res = graph_engine.compute_clusters_and_modularity()
     cluster_info = None
     for c in res.clusters:
@@ -312,7 +312,6 @@ async def get_sar_pdf(cluster_id: int = 1):
 async def simulate_swarm():
     """Populates graph engine with 80 legitimate humans and 20 synchronized bots."""
     result = populate_mock_cyber_range(graph_engine)
-    # Broadcast simulation alert
     await ws_manager.broadcast({
         "type": "SWARM_SIMULATION_DEPLOYED",
         "human_nodes": result["human_nodes"],
@@ -361,12 +360,10 @@ async def websocket_endpoint(websocket: WebSocket):
     """Streams live telemetry packets and periodic graph state to the 3D cockpit."""
     await ws_manager.connect(websocket)
     try:
-        # Send initial graph snapshot immediately upon connection
         current_state = graph_engine.compute_clusters_and_modularity().model_dump()
         await websocket.send_json({"type": "INITIAL_GRAPH_STATE", "data": current_state})
 
         while True:
-            # Keepalive listener
             data = await websocket.receive_text()
             if data == "ping":
                 await websocket.send_text("pong")

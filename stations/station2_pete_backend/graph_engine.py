@@ -2,9 +2,15 @@ import time
 from typing import Dict, List, Set, Tuple, Optional, Any
 import networkx as nx
 from networkx.algorithms.community import louvain_communities, modularity
-from backend.models import GraphNode, GraphLink, GraphCluster, GraphResponse
-from backend.embedding_worker import SemanticIntentWorker
-from backend.kinetic_classifier import KineticJerkClassifier
+
+try:
+    from models import GraphNode, GraphLink, GraphCluster, GraphResponse
+    from embedding_worker import SemanticIntentWorker
+    from kinetic_classifier import KineticJerkClassifier
+except ImportError:
+    from backend.models import GraphNode, GraphLink, GraphCluster, GraphResponse
+    from backend.embedding_worker import SemanticIntentWorker
+    from backend.kinetic_classifier import KineticJerkClassifier
 
 class SessionProfile:
     """Represents an active applicant session state inside the rolling window."""
@@ -166,7 +172,6 @@ class ShadowGraphEngine:
         elif delta_t < 1.40:
             s_time = 0.92 - (delta_t * 0.05)
         else:
-            # Exponential decay kernel: survives deliberate delay injections across minutes
             import math
             s_time = max(0.0, math.exp(-delta_t / 45.0))
         layer_scores["timing"] = round(s_time, 4)
@@ -199,19 +204,18 @@ class ShadowGraphEngine:
         avg_jerk_v = sum(v.jerk_scores) / max(len(v.jerk_scores), 1) if v.jerk_scores else 0.5
         jerk_diff = abs(avg_jerk_u - avg_jerk_v)
 
-        # Baseline kinematic score
         if avg_jerk_u > 0.80 and avg_jerk_v > 0.80:
             s_kin = 0.95 - jerk_diff
         else:
             s_kin = 1.0 - jerk_diff
 
-        # Event-stream invariant booster: click dwell agreement
+        # Event-stream invariant booster
         if u.click_dwell_duration_ms is not None and v.click_dwell_duration_ms is not None:
             dwell_diff = abs(u.click_dwell_duration_ms - v.click_dwell_duration_ms)
             if dwell_diff < 10.0:
                 s_kin = min(1.0, s_kin + 0.05)
 
-        # Mobile touch dynamics booster: swipe velocity agreement
+        # Mobile touch dynamics booster
         if u.touch_swipe_velocity is not None and v.touch_swipe_velocity is not None:
             vel_diff = abs(u.touch_swipe_velocity - v.touch_swipe_velocity)
             if vel_diff < 0.15:
@@ -247,8 +251,6 @@ class ShadowGraphEngine:
 
             comp_score, converged, delta_t = self.calculate_pairwise_similarity(u, v)
 
-            # 3-Layer Orthogonal Sparsification Filter:
-            # Instantiate edge ONLY if composite score >= 0.78 AND at least 3 layers converge!
             if comp_score >= self.edge_threshold and len(converged) >= 3:
                 self.graph.add_edge(
                     account_id, other_id,
@@ -273,13 +275,10 @@ class ShadowGraphEngine:
         if observed_weight <= 0:
             return 0.50
 
-        # Empirical null model: shuffle and estimate probability of random dense alignment
-        # In multi-layer converged clusters (N >= 5, 3 layers aligned), p < 0.001
         import random
         null_exceed_count = 0
         all_nodes = list(self.graph.nodes())
         if len(all_nodes) <= c_size:
-            # Planted synthetic syndicate
             return 0.0003
 
         for _ in range(iterations):
@@ -295,18 +294,15 @@ class ShadowGraphEngine:
     def repair_boundary_edges(self) -> nx.Graph:
         """
         B-GUARD Boundary Graph Repair:
-        Detects anomalous bridge nodes (adversarial clean accounts inserted to dilute modularity Q)
-        and temporarily down-weights bridge edges before community clustering (BOCLOAK 2026).
+        Detects anomalous bridge nodes and down-weights bridge edges before community clustering.
         """
         G_repaired = self.graph.copy()
         if G_repaired.number_of_nodes() < 4 or G_repaired.number_of_edges() < 3:
             return G_repaired
 
-        # Identify boundary bridge nodes with high betweenness but low internal layer convergence
         betweenness = nx.betweenness_centrality(G_repaired)
         for node, bc in betweenness.items():
             if bc > 0.35:
-                # Down-weight cross-boundary bridge edges to maintain modularity Q
                 for neighbor in list(G_repaired.neighbors(node)):
                     edge_data = G_repaired.get_edge_data(node, neighbor)
                     if edge_data and len(edge_data.get("converged", [])) < 3:
@@ -325,11 +321,10 @@ class ShadowGraphEngine:
         # 1. Boundary graph repair against adversarial bridge nodes
         G_work = self.repair_boundary_edges()
 
-        # 2. Leiden community detection (guarantees connected communities)
+        # 2. Leiden community detection
         try:
             if G_work.number_of_edges() > 0:
                 raw_communities = louvain_communities(G_work, weight="weight", seed=42)
-                # Ensure every community is a connected component
                 connected_communities = []
                 for comm in raw_communities:
                     sub = G_work.subgraph(comm)
@@ -353,33 +348,25 @@ class ShadowGraphEngine:
             members = list(comm)
             c_size = len(members)
 
-            # Check internal edges for this community
             subG = self.graph.subgraph(members)
             internal_edges = subG.number_of_edges()
             max_possible_edges = (c_size * (c_size - 1)) / 2 if c_size > 1 else 1
             internal_density = internal_edges / max(max_possible_edges, 1)
 
-            # Mark syndicate clusters with size >= 3 and dense internal connectivity
             is_syndicate = c_size >= 3 and internal_edges >= (c_size - 1) and internal_density >= 0.40
             cid = cluster_id_counter if is_syndicate else 0
 
             if is_syndicate:
                 status = "quarantined" if cid in self.quarantined_clusters else "active"
-
-                # Compute effective modularity Q for this cluster
                 weights = [d.get("weight", 0.8) for _, _, d in subG.edges(data=True)]
                 mean_weight = (sum(weights) / len(weights)) if weights else 0.85
                 cluster_q = q_score if q_score > 0.10 else round(internal_density * mean_weight * 0.88, 4)
 
-                # Empirical Permutation Test P-Value
                 p_val = self.calculate_permutation_p_value(members)
-
-                # Denial-of-Wallet Savings: ₹61.00 per applicant prevented at Form Step 2
                 cluster_dow = round(c_size * 61.0, 2)
                 if status == "quarantined":
                     total_dow_savings += cluster_dow
 
-                # Extract aggregate factual reasons complying with Regulation B
                 avg_jerk = 0.0
                 jerk_counts = 0
                 for m in members:
@@ -468,18 +455,13 @@ class ShadowGraphEngine:
         count = 0
         for acc_id, prof in self.sessions.items():
             if prof.cluster_id == cluster_id or cluster_id == 1:
-                # Mark cluster accounts as quarantined
                 prof.status = "quarantined"
                 prof.step_up_status = "pending"
                 count += 1
         return count
 
     def verify_step_up(self, session_id: str, account_id: str, method: str = "upi_penny_drop") -> bool:
-        """
-        Step-up challenge resolution:
-        When a quarantined user completes the non-punitive verification (₹1 UPI penny-drop / AA),
-        this clears their quarantine status and marks step_up_status='cleared'.
-        """
+        """Step-up challenge resolution: clears quarantine status."""
         for prof in self.sessions.values():
             if prof.account_id == account_id or prof.session_id == session_id:
                 prof.status = "active"
@@ -487,6 +469,25 @@ class ShadowGraphEngine:
                 prof.risk_label = "normal_organic"
                 return True
         return False
+
+    def get_dow_stats(self) -> Dict[str, Any]:
+        """Returns live Denial-of-Wallet (DoW) economic defense metrics."""
+        quarantined_count = sum(1 for prof in self.sessions.values() if prof.status == "quarantined")
+        # Fee vector: UIDAI ₹3.00, PAN ₹2.00, Face Liveness ₹6.00, Bureau ₹50.00 = ₹61.00 total
+        aadhaar_saved = quarantined_count * 3.0
+        pan_saved = quarantined_count * 2.0
+        liveness_saved = quarantined_count * 6.0
+        bureau_saved = quarantined_count * 50.0
+        total_saved = aadhaar_saved + pan_saved + liveness_saved + bureau_saved
+
+        return {
+            "total_bots_intercepted": quarantined_count,
+            "total_inr_saved": total_saved,
+            "prevented_aadhaar_cost": aadhaar_saved,
+            "prevented_pan_cost": pan_saved,
+            "prevented_liveness_cost": liveness_saved,
+            "prevented_bureau_cost": bureau_saved
+        }
 
     def reset(self) -> None:
         """Clear graph state for fresh demonstration."""
