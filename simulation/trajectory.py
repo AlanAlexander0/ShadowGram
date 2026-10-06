@@ -10,20 +10,29 @@ from typing import List, Tuple
 
 
 def generate_human_trajectory(
-    p0: Tuple[float, float],
-    p3: Tuple[float, float],
+    p0: Any,
+    p3: Any = None,
+    *args,
     duration: float = 0.65,
     fps: int = 60,
     overshoot_threshold: float = 220.0,
     overshoot_ratio: float = 0.08,
     noise_sigma: float = 0.45,
+    **kwargs
 ) -> List[Tuple[float, float, float]]:
     """
     Generates a realistic biological human cursor trajectory between p0 and p3.
-    
-    Returns:
-        List of (x, y, t) tuples where t is relative elapsed time in seconds.
+    Accepts either p0=(x1,y1), p3=(x2,y2) or x1, y1, x2, y2.
+    Returns: List of (x, y, t) tuples where t is relative elapsed time in seconds.
     """
+    if isinstance(p0, (int, float)) and isinstance(p3, (int, float)) and len(args) >= 2:
+        p0, p3 = (float(p0), float(p3)), (float(args[0]), float(args[1]))
+    elif p3 is None:
+        p3 = (800.0, 600.0)
+
+    if "points" in kwargs and kwargs["points"]:
+        fps = int(kwargs["points"] / max(duration, 0.1))
+
     dx = p3[0] - p0[0]
     dy = p3[1] - p0[1]
     dist = math.hypot(dx, dy)
@@ -73,6 +82,9 @@ def generate_human_trajectory(
             path.append((round(cx + c_tremor, 2), round(cy + c_tremor, 2), round(lt + (j / corr_steps) * corr_time, 4)))
 
     return path
+
+# Alias for backwards compatibility
+generate_human_bezier_trajectory = generate_human_trajectory
 
 
 if __name__ == "__main__":

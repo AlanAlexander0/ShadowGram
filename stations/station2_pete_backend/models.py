@@ -1,11 +1,31 @@
 from typing import List, Optional, Any, Dict
-from pydantic import BaseModel, Field
 import time
-from sqlalchemy import Column, String, Float, Integer, Text, DateTime
-from sqlalchemy.orm import declarative_base
 from datetime import datetime, timezone
 
-Base = declarative_base()
+try:
+    from pydantic import BaseModel, Field
+except ImportError:
+    class BaseModel:
+        def __init__(self, **kwargs):
+            for k, v in kwargs.items():
+                setattr(self, k, v)
+        def dict(self):
+            return self.__dict__
+    def Field(default=None, default_factory=None):
+        if default_factory is not None:
+            return default_factory()
+        return default
+
+try:
+    from sqlalchemy import Column, String, Float, Integer, Text, DateTime
+    from sqlalchemy.orm import declarative_base
+    Base = declarative_base()
+except ImportError:
+    class Base:
+        pass
+    def Column(*args, **kwargs):
+        return None
+    String = Float = Integer = Text = DateTime = lambda *args, **kwargs: None
 
 # ---------------------------------------------------------
 # SQLAlchemy Database Models (shadowgram.db)

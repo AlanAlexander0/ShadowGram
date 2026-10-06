@@ -36,6 +36,7 @@ class SessionProfile:
         self.mousemove_pre_click_count: Optional[int] = None
         self.touch_swipe_velocity: Optional[float] = None
         self.touch_contact_area: Optional[float] = None
+        self.ip_hash: Optional[str] = None
 
 
 class ShadowGraphEngine:
@@ -137,6 +138,9 @@ class ShadowGraphEngine:
         if "client_canvas_hash" in payload and payload["client_canvas_hash"]:
             prof.canvas_hash = payload["client_canvas_hash"]
 
+        if "ip_hash" in payload and payload["ip_hash"]:
+            prof.ip_hash = payload["ip_hash"]
+
         # Re-evaluate edges incident to this account
         self.recompute_node_edges(account_id)
 
@@ -167,13 +171,16 @@ class ShadowGraphEngine:
 
         # 1. Micro-Timing Arrival Layer (Δt with Exponential Decay Kernel)
         delta_t = abs(u.timestamp - v.timestamp)
-        if delta_t < 0.10:
+        if delta_t < 0.15:
             s_time = 0.99
-        elif delta_t < 1.40:
-            s_time = 0.92 - (delta_t * 0.05)
+        elif delta_t < 1.50:
+            s_time = 0.92 - (delta_t * 0.06)
+        elif delta_t < 4.0:
+            s_time = 0.82 - (delta_t * 0.05)
         else:
+            # Exponential decay kernel: rapid dropoff for independent organic submissions
             import math
-            s_time = max(0.0, math.exp(-delta_t / 45.0))
+            s_time = max(0.0, math.exp(-delta_t / 10.0))
         layer_scores["timing"] = round(s_time, 4)
         if s_time >= 0.70:
             converged_layers.append("timing")
@@ -183,7 +190,9 @@ class ShadowGraphEngine:
             set_u, set_v = set(u.routes), set(v.routes)
             jaccard = len(set_u & set_v) / max(len(set_u | set_v), 1)
             order_match = 1.0 if u.routes == v.routes else 0.5
-            s_nav = 0.5 * jaccard + 0.5 * order_match
+            path_depth = min(len(u.routes), len(v.routes))
+            depth_factor = 1.0 if path_depth >= 2 else 0.70
+            s_nav = (0.5 * jaccard + 0.5 * order_match) * depth_factor
         else:
             s_nav = 0.0
         layer_scores["navigation"] = round(s_nav, 4)
@@ -204,22 +213,26 @@ class ShadowGraphEngine:
         avg_jerk_v = sum(v.jerk_scores) / max(len(v.jerk_scores), 1) if v.jerk_scores else 0.5
         jerk_diff = abs(avg_jerk_u - avg_jerk_v)
 
-        if avg_jerk_u > 0.80 and avg_jerk_v > 0.80:
-            s_kin = 0.95 - jerk_diff
+        # High kinetic correlation requires both sessions to exhibit synthetic automated profiles
+        if avg_jerk_u > 0.70 and avg_jerk_v > 0.70:
+            s_kin = max(0.0, 0.95 - jerk_diff)
+        elif avg_jerk_u < 0.05 and avg_jerk_v < 0.05:
+            s_kin = 0.95  # Zero-jerk instantaneous automated macros
         else:
-            s_kin = 1.0 - jerk_diff
+            # Organic human physiological tremor (8-12 Hz) is independent random noise
+            s_kin = max(0.0, 0.30 - jerk_diff)
 
-        # Event-stream invariant booster
-        if u.click_dwell_duration_ms is not None and v.click_dwell_duration_ms is not None:
-            dwell_diff = abs(u.click_dwell_duration_ms - v.click_dwell_duration_ms)
-            if dwell_diff < 10.0:
-                s_kin = min(1.0, s_kin + 0.05)
+        # Event-stream invariant booster: click dwell agreement (only boosts if synthetic base)
+        if avg_jerk_u > 0.60 and avg_jerk_v > 0.60:
+            if u.click_dwell_duration_ms is not None and v.click_dwell_duration_ms is not None:
+                dwell_diff = abs(u.click_dwell_duration_ms - v.click_dwell_duration_ms)
+                if dwell_diff < 10.0:
+                    s_kin = min(1.0, s_kin + 0.05)
 
-        # Mobile touch dynamics booster
-        if u.touch_swipe_velocity is not None and v.touch_swipe_velocity is not None:
-            vel_diff = abs(u.touch_swipe_velocity - v.touch_swipe_velocity)
-            if vel_diff < 0.15:
-                s_kin = min(1.0, s_kin + 0.05)
+            if u.touch_swipe_velocity is not None and v.touch_swipe_velocity is not None:
+                vel_diff = abs(u.touch_swipe_velocity - v.touch_swipe_velocity)
+                if vel_diff < 0.15:
+                    s_kin = min(1.0, s_kin + 0.05)
 
         layer_scores["kinetics"] = round(s_kin, 4)
         if s_kin >= 0.70:
@@ -238,12 +251,15 @@ class ShadowGraphEngine:
         composite_score = sum(w[k] * layer_scores[k] for k in w)
 
         # Common-Cause Adjustment (Flash Crowds / Campus Wi-Fi):
-        # If two sessions share network IP / campus environment, but have divergent navigation routes
-        # or semantic text, down-weight similarity so legitimate crowd correlation is not classified as coordination.
+        # Down-weight similarity for sessions colocated on the same IP subnet
         common_cause_discount = 0.0
-        if u.ip_hash and v.ip_hash and u.ip_hash == v.ip_hash:
-            if s_nav < 0.60 or s_sem < 0.60:
-                common_cause_discount = 0.20
+        u_ip = getattr(u, "ip_hash", None)
+        v_ip = getattr(v, "ip_hash", None)
+        if u_ip and v_ip and u_ip == v_ip:
+            common_cause_discount = 0.35
+            # If both sessions also exhibit synthetic bot kinetics, reduce discount
+            if avg_jerk_u > 0.70 and avg_jerk_v > 0.70:
+                common_cause_discount = 0.10
 
         final_composite_score = max(0.0, composite_score - common_cause_discount)
 
@@ -408,10 +424,14 @@ class ShadowGraphEngine:
 
                 for m in members:
                     cluster_map[m] = cid
+                    if m in self.sessions:
+                        self.sessions[m].cluster_id = cid
                 cluster_id_counter += 1
             else:
                 for m in members:
                     cluster_map[m] = 0
+                    if m in self.sessions:
+                        self.sessions[m].cluster_id = None
 
         # Build nodes response
         nodes_out: List[GraphNode] = []
@@ -463,6 +483,10 @@ class ShadowGraphEngine:
             total_dow_savings_inr=round(total_dow_savings, 2)
         )
 
+    def get_graph_state(self) -> GraphResponse:
+        """Alias for compute_clusters_and_modularity() for benchmark and test compatibility."""
+        return self.compute_clusters_and_modularity()
+
     def quarantine_cluster(self, cluster_id: int) -> int:
         """Sets status of all accounts in cluster to quarantined."""
         self.quarantined_clusters.add(cluster_id)
@@ -474,11 +498,13 @@ class ShadowGraphEngine:
                 count += 1
         return count
 
-    def verify_step_up(self, session_id: str, account_id: str, method: str = "upi_penny_drop") -> bool:
+    def verify_step_up(self, identifier: str, account_id: Optional[str] = None, method: str = "upi_penny_drop") -> bool:
         """Step-up challenge resolution: clears quarantine status."""
+        target_acc = account_id or identifier
+        target_sess = identifier
         for prof in self.sessions.values():
-            if prof.account_id == account_id or prof.session_id == session_id:
-                prof.status = "active"
+            if prof.account_id in (identifier, target_acc) or prof.session_id in (identifier, target_sess):
+                prof.status = "cleared"
                 prof.step_up_status = "cleared"
                 prof.risk_label = "normal_organic"
                 return True
